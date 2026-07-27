@@ -1,0 +1,4 @@
+interface:
+  display_name: "Generate .NET Integration Tests"
+  short_description: "End-to-end ASP.NET Core integration coverage"
+  default_prompt: "Use $generate-dotnet-integration-tests to add integration coverage using repository context."

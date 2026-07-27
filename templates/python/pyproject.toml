@@ -19,16 +19,31 @@ packages = ["src/customer_api"]
 [dependency-groups]
 dev = [
   "httpx>=0.28,<1",
+  "import-linter>=2.13,<3",
   "mypy>=1.15,<2",
+  "pip-audit>=2.10,<3",
   "pre-commit>=4.1,<5",
-  "pytest>=8.3,<9",
+  "pytest>=9.0.3,<10",
   "pytest-cov>=6,<7",
-  "ruff>=0.11,<1"
+  "ruff>=0.11,<1",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--strict-markers --cov=src --cov-report=term-missing"
+
+[tool.coverage.report]
+fail_under = 70
+
+[tool.importlinter]
+root_package = "customer_api"
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Domain and repository must not depend on the web layer"
+type = "forbidden"
+source_modules = ["customer_api.domain", "customer_api.repository"]
+forbidden_modules = ["fastapi", "starlette", "uvicorn", "customer_api.main"]
 
 [tool.ruff]
 line-length = 100

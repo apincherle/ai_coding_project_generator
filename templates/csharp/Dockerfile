@@ -43,8 +43,14 @@ FROM ${RUNTIME_IMAGE} AS production
 ARG PORT
 ENV ASPNETCORE_URLS=http://+:${PORT} \
     PORT=${PORT}
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends curl \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /app .
 USER $APP_UID
 EXPOSE ${PORT}
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -fsS "http://127.0.0.1:${PORT}/health" || exit 1
 ENTRYPOINT ["dotnet", "CustomerApi.dll"]

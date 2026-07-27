@@ -1,0 +1,4 @@
+interface:
+  display_name: "Decide .NET Architecture"
+  short_description: "Work through a .NET architecture decision"
+  default_prompt: "Use $decide-dotnet-architecture to work through this architecture decision using repository context."

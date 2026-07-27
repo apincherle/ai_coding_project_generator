@@ -1,0 +1,4 @@
+interface:
+  display_name: "Assess .NET Dependency"
+  short_description: "Vet a new NuGet package before adding it"
+  default_prompt: "Use $assess-dotnet-dependency to assess this candidate dependency using repository policy."

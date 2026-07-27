@@ -1,0 +1,4 @@
+interface:
+  display_name: "Check Context Completeness"
+  short_description: "Audit AI context for gaps and drift"
+  default_prompt: "Use $check-context-completeness to audit this repository's AI context."

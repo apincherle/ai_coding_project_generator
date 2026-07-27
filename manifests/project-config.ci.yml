@@ -1,0 +1,25 @@
+# CI / local smoke fixture — intentional non-sample identity (not Customer).
+projectName: PLACEHOLDER_PROJECT_NAME
+description: Catalogue CI fixture project for generator validation.
+entityName: Account
+owners:
+  technical: "@platform-engineering"
+  business: "@product-owners"
+riskClassification: medium
+dataClassification: internal
+productionCriticality: medium
+deploymentTarget: kubernetes
+identity:
+  java:
+    groupId: com.acme
+    artifactId: PLACEHOLDER_ARTIFACT
+    basePackage: com.acme.account
+  python:
+    distributionName: PLACEHOLDER_ARTIFACT
+    packageName: account_api
+  csharp:
+    rootNamespace: Acme.AccountApi
+    solutionName: AccountApi
+    projectName: AccountApi
+databaseName: accounts
+openApiTitle: Account API

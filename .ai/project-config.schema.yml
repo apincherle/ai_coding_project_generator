@@ -1,0 +1,80 @@
+# Project configuration schema (documentation + generator contract)
+#
+# Generated projects MUST contain `.ai/project-config.yml` matching this shape.
+# Supply via create-project.ps1 -ConfigPath or equivalent API fields.
+
+type: object
+required:
+  - projectName
+  - description
+  - entityName
+  - owners
+  - riskClassification
+  - dataClassification
+  - productionCriticality
+  - deploymentTarget
+  - identity
+
+properties:
+  projectName:
+    type: string
+    description: Must match generator -ProjectName / folder leaf.
+  description:
+    type: string
+  entityName:
+    type: string
+    description: PascalCase singular domain entity (e.g. Account). Not Customer unless intentional.
+  owners:
+    type: object
+    required: [technical, business]
+    properties:
+      technical: { type: string }
+      business: { type: string }
+  riskClassification:
+    type: string
+    enum: [low, medium, high, critical]
+  dataClassification:
+    type: string
+    enum: [public, internal, confidential, restricted]
+  productionCriticality:
+    type: string
+    enum: [low, medium, high, critical]
+  deploymentTarget:
+    type: string
+    description: e.g. kubernetes, vm, serverless, on-prem
+  identity:
+    type: object
+    required: [java, python, csharp]
+    properties:
+      java:
+        type: object
+        required: [groupId, artifactId, basePackage]
+        properties:
+          groupId: { type: string }
+          artifactId: { type: string }
+          basePackage: { type: string }
+      python:
+        type: object
+        required: [distributionName, packageName]
+        properties:
+          distributionName: { type: string }
+          packageName: { type: string }
+      csharp:
+        type: object
+        required: [rootNamespace, solutionName, projectName]
+        properties:
+          rootNamespace: { type: string }
+          solutionName: { type: string }
+          projectName: { type: string }
+  databaseName:
+    type: string
+    description: Defaults to plural snake of entityName when omitted.
+  openApiTitle:
+    type: string
+    description: Defaults to "<entityName> API" when omitted.
+
+forbiddenPlaceholders:
+  - TODO
+  - changeme
+  - example.com
+  - REPLACE_ME

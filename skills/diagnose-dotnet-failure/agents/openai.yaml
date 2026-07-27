@@ -1,0 +1,4 @@
+interface:
+  display_name: "Diagnose .NET Failure"
+  short_description: "Root-cause C#/.NET failures"
+  default_prompt: "Use $diagnose-dotnet-failure to diagnose this failure using repository context."

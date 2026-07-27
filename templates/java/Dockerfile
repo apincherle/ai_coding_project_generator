@@ -50,4 +50,6 @@ WORKDIR /app
 COPY --from=build /src/target/customer-api-*.jar /app/app.jar
 USER ${UID}
 EXPOSE ${PORT}
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+  CMD curl -fsS "http://127.0.0.1:${PORT}/actuator/health/liveness" || exit 1
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]

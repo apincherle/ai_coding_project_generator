@@ -1,0 +1,4 @@
+interface:
+  display_name: "Assess Python Dependency"
+  short_description: "Vet a new Python package before adding it"
+  default_prompt: "Use $assess-python-dependency to assess this candidate dependency using repository policy."

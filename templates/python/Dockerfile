@@ -91,5 +91,8 @@ RUN chmod +x /docker-entrypoint.sh
 USER app
 WORKDIR /app
 EXPOSE ${PORT}
+# Use the stdlib rather than adding curl, keeping this runtime image minimal.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD python -c "import os,sys,urllib.request; urllib.request.urlopen(f'http://127.0.0.1:{os.environ[\"PORT\"]}/health', timeout=3)" || exit 1
 ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 CMD ["sh", "-c", "uvicorn customer_api.main:app --host 0.0.0.0 --port ${PORT}"]

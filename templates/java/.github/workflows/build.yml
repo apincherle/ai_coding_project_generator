@@ -7,12 +7,17 @@ on:
 
 permissions:
   contents: read
+  id-token: write
+  attestations: write
 
 jobs:
   verify:
     runs-on: ubuntu-24.04
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -20,3 +25,13 @@ jobs:
           cache: maven
           cache-dependency-path: pom.xml
       - run: mvn -B verify
+      - name: Generate CycloneDX SBOM
+        run: mvn -B -Psecurity org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: target/bom.json
+      - name: Attest SBOM provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: target/bom.json

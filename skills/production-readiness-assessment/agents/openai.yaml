@@ -1,0 +1,4 @@
+interface:
+  display_name: "Production Readiness Assessment"
+  short_description: "Go/no-go check before first release"
+  default_prompt: "Use $production-readiness-assessment to assess whether this service is ready for production."

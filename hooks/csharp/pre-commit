@@ -2,6 +2,7 @@
 set -eu
 root="$(git rev-parse --show-toplevel)"
 cd "$root"
-dotnet format --verify-no-changes
-dotnet build -warnaserror
-dotnet test
+dotnet restore --locked-mode
+dotnet format --verify-no-changes --no-restore
+dotnet build --no-restore -warnaserror
+dotnet test --no-build

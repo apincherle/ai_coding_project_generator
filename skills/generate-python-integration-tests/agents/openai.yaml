@@ -1,0 +1,4 @@
+interface:
+  display_name: "Generate Python Integration Tests"
+  short_description: "End-to-end FastAPI integration coverage"
+  default_prompt: "Use $generate-python-integration-tests to add integration coverage using repository context."

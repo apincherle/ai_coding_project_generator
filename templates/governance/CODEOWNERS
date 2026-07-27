@@ -1,0 +1,8 @@
+# CODEOWNERS
+# Generated from .ai/project-config.yml — keep owners in sync with that file.
+
+* {{TECHNICAL_OWNER}} {{BUSINESS_OWNER}}
+/.ai/ {{TECHNICAL_OWNER}}
+/.github/ {{TECHNICAL_OWNER}}
+/docs/security* {{TECHNICAL_OWNER}}
+/SECURITY.md {{TECHNICAL_OWNER}}

@@ -2,4 +2,8 @@
 set -eu
 root="$(git rev-parse --show-toplevel)"
 cd "$root"
-mvn -q spotless:check checkstyle:check test
+if [ -x ./mvnw ]; then
+  ./mvnw -q spotless:check checkstyle:check pmd:check spotbugs:check test
+else
+  mvn -q spotless:check checkstyle:check pmd:check spotbugs:check test
+fi

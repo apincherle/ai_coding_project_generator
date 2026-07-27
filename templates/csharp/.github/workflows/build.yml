@@ -1,14 +1,33 @@
 name: build
 on: [push, pull_request]
-permissions: {contents: read}
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: actions/setup-dotnet@v4
         with: {dotnet-version: 9.0.x}
-      - run: dotnet restore
-      - run: dotnet format --verify-no-changes
+      # Locked restore fails closed when packages.lock.json is missing or stale.
+      - run: dotnet restore --locked-mode
+      - run: dotnet format --verify-no-changes --no-restore
       - run: dotnet build --no-restore -warnaserror
-      - run: dotnet test --no-build
+      - run: dotnet test --no-build --collect:"XPlat Code Coverage" --settings coverlet.runsettings
+      - name: Generate CycloneDX SBOM
+        run: |
+          dotnet tool install --global CycloneDX
+          dotnet CycloneDX . -o . -f json -fn sbom
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.json
+      - name: Attest SBOM provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: sbom.json

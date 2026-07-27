@@ -1,9 +1,33 @@
 rules:
+  # --- Java ---
   - id: java-no-system-out
     languages: [java]
     message: Use the approved structured logger instead of System.out.
     severity: WARNING
     pattern: System.out.$METHOD(...)
+  - id: java-no-print-stack-trace
+    languages: [java]
+    message: Do not print stack traces directly; use the approved structured logger.
+    severity: WARNING
+    pattern: $EX.printStackTrace()
+  - id: java-no-insecure-random-for-security
+    languages: [java]
+    message: Use java.security.SecureRandom instead of java.util.Random for security-sensitive values (tokens, ids, secrets).
+    severity: WARNING
+    pattern: new Random(...)
+  - id: java-no-hardcoded-secret
+    languages: [java]
+    message: Do not hardcode credentials, tokens or secrets in source; load them from configuration or a secret store.
+    severity: ERROR
+    patterns:
+      - pattern-either:
+          - pattern: String $VAR = "...";
+          - pattern: private static final String $VAR = "...";
+      - metavariable-regex:
+          metavariable: $VAR
+          regex: (?i)^.*(password|secret|apikey|api_key|token)$
+
+  # --- Python ---
   - id: python-no-eval
     languages: [python]
     message: Do not execute dynamic input with eval.
@@ -14,8 +38,49 @@ rules:
     message: Avoid shell=True; pass an argument list to subprocess APIs.
     severity: ERROR
     pattern: subprocess.$METHOD(..., shell=True, ...)
+  - id: python-no-pickle-loads
+    languages: [python]
+    message: Do not deserialize untrusted data with pickle.loads/pickle.load; use a safe format such as JSON.
+    severity: ERROR
+    pattern-either:
+      - pattern: pickle.loads(...)
+      - pattern: pickle.load(...)
+  - id: python-no-unsafe-yaml-load
+    languages: [python]
+    message: Use yaml.safe_load (or yaml.load with an explicit SafeLoader) instead of yaml.load on untrusted input.
+    severity: ERROR
+    pattern: yaml.load($DATA)
+  - id: python-no-hardcoded-secret
+    languages: [python]
+    message: Do not hardcode credentials, tokens or secrets in source; load them from configuration or a secret store.
+    severity: ERROR
+    patterns:
+      - pattern: $VAR = "..."
+      - metavariable-regex:
+          metavariable: $VAR
+          regex: (?i)^.*(password|secret|api_key|apikey|token)$
+
+  # --- C# ---
   - id: csharp-no-process-shell-execute
     languages: [csharp]
     message: Do not enable shell execution for process input.
     severity: ERROR
     pattern: new ProcessStartInfo(...) { ..., UseShellExecute = true, ... }
+  - id: csharp-no-weak-hash
+    languages: [csharp]
+    message: MD5 and SHA1 are not collision resistant; use SHA-256 or better for integrity/security purposes.
+    severity: WARNING
+    pattern-either:
+      - pattern: MD5.Create()
+      - pattern: SHA1.Create()
+  - id: csharp-no-hardcoded-secret
+    languages: [csharp]
+    message: Do not hardcode credentials, tokens or secrets in source; load them from configuration or a secret store.
+    severity: ERROR
+    patterns:
+      - pattern-either:
+          - pattern: string $VAR = "...";
+          - pattern: private const string $VAR = "...";
+      - metavariable-regex:
+          metavariable: $VAR
+          regex: (?i)^.*(password|secret|apikey|api_key|token)$

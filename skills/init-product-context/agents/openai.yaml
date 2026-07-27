@@ -1,0 +1,4 @@
+interface:
+  display_name: "Initialize Product Context"
+  short_description: "Fill in a generated project's product context"
+  default_prompt: "Use $init-product-context to populate this project's product context and configuration."

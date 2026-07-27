@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   semgrep:
+    name: static analysis (semgrep)
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -18,3 +19,54 @@ jobs:
       - uses: semgrep/semgrep-action@v1
         with:
           config: config/semgrep.yml
+
+  secret-scan:
+    name: secret scan (gitleaks)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      # Pinned by major version tag (verified against the vendor-published release notes at
+      # the time of writing). Record the release commit SHA in this comment once the
+      # organisation's supply-chain policy assigns one, and pin to that SHA instead.
+      - uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  container-scan:
+    name: container scan (trivy)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      # Filesystem/config scan of manifests, Dockerfiles and lockfiles in this catalogue.
+      # Pinned by version tag; aquasecurity/trivy-action suffered a tag-hijacking supply-chain
+      # attack in March 2026 (GHSA-69fq-xp46-6x23) — only use tags >= v0.35.0, and record the
+      # release commit SHA in this comment to pin by SHA once the organisation assigns one.
+      # Generated projects that build container images should add an `image-ref` scan step
+      # using this same action, pointed at the freshly built image, after `docker build`.
+      - name: Trivy filesystem scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: CRITICAL,HIGH
+          exit-code: "1"
+          ignore-unfixed: true
+
+  exception-expiry:
+    name: governance exception expiry
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Fail on expired governance exceptions
+        shell: pwsh
+        run: ./scripts/check-exceptions.ps1 -Path docs/exceptions

@@ -2,4 +2,8 @@
 set -eu
 root="$(git rev-parse --show-toplevel)"
 cd "$root"
-mvn -q verify
+if [ -x ./mvnw ]; then
+  ./mvnw -q verify
+else
+  mvn -q verify
+fi

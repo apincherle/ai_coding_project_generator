@@ -1,0 +1,4 @@
+interface:
+  display_name: "Threat Model Python Service"
+  short_description: "Lightweight Python/FastAPI threat modeling"
+  default_prompt: "Use $threat-model-python to build or update the threat model using repository context."

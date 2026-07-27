@@ -12,30 +12,37 @@ jobs:
   catalogue:
     name: validate profile catalogue
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - name: Generate and validate every profile
         shell: pwsh
         run: |
           $manifest = Get-Content ./manifests/profiles.json -Raw |
             ConvertFrom-Json
           $profiles = $manifest.profiles.PSObject.Properties.Name
+          $fixture = Join-Path $pwd "manifests/project-config.ci.yml"
 
           foreach ($profile in $profiles) {
-            # Leaf folder must match -ProjectName (or pass a parent folder).
             $destination = Join-Path $env:RUNNER_TEMP "ci-$profile"
             ./scripts/create-project.ps1 `
               -Profile $profile `
               -ProjectName "ci-$profile" `
-              -Destination $destination
+              -Destination $destination `
+              -ConfigPath $fixture
             ./scripts/validate-generated-project.ps1 -Path $destination
           }
 
   java:
     name: generated Java starter
     runs-on: ubuntu-24.04
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -48,7 +55,8 @@ jobs:
           ./scripts/create-project.ps1 `
             -Profile java `
             -ProjectName ci-java `
-            -Destination "$env:RUNNER_TEMP/ci-java"
+            -Destination "$env:RUNNER_TEMP/ci-java" `
+            -ConfigPath ./manifests/project-config.ci.yml
           ./scripts/validate-generated-project.ps1 `
             -Path "$env:RUNNER_TEMP/ci-java"
       - name: Verify generated Spring Boot project
@@ -58,8 +66,11 @@ jobs:
   python:
     name: generated Python starter
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
@@ -73,7 +84,8 @@ jobs:
           ./scripts/create-project.ps1 `
             -Profile python `
             -ProjectName ci-python `
-            -Destination "$env:RUNNER_TEMP/ci-python"
+            -Destination "$env:RUNNER_TEMP/ci-python" `
+            -ConfigPath ./manifests/project-config.ci.yml
           ./scripts/validate-generated-project.ps1 `
             -Path "$env:RUNNER_TEMP/ci-python"
       - name: Install approved dependencies
@@ -90,8 +102,11 @@ jobs:
   csharp:
     name: generated C# starter
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: "9.0.x"
@@ -101,7 +116,8 @@ jobs:
           ./scripts/create-project.ps1 `
             -Profile csharp `
             -ProjectName ci-csharp `
-            -Destination "$env:RUNNER_TEMP/ci-csharp"
+            -Destination "$env:RUNNER_TEMP/ci-csharp" `
+            -ConfigPath ./manifests/project-config.ci.yml
           ./scripts/validate-generated-project.ps1 `
             -Path "$env:RUNNER_TEMP/ci-csharp"
       - name: Restore approved dependencies

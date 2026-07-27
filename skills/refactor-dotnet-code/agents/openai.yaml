@@ -1,0 +1,4 @@
+interface:
+  display_name: "Refactor .NET Code"
+  short_description: "Behaviour-preserving .NET refactors"
+  default_prompt: "Use $refactor-dotnet-code to refactor this code using repository context."

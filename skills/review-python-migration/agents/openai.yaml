@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Python Migration"
+  short_description: "Review Python upgrades and migrations"
+  default_prompt: "Use $review-python-migration to review this migration or upgrade using repository context."

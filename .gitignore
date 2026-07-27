@@ -66,6 +66,13 @@ _pdf_extract/
 templates/**/.ruff_cache/
 templates/**/.pytest_cache/
 templates/**/.mypy_cache/
+manifests/.api-config-uploads/
 templates/**/bin/
 templates/**/obj/
 templates/**/target/
+
+# Locally generated SBOM artefacts (CI uploads these as build artifacts instead)
+sbom.json
+sbom.xml
+bom.json
+bom.xml

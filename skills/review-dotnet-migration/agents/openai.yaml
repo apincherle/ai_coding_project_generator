@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review .NET Migration"
+  short_description: "Review .NET upgrades and migrations"
+  default_prompt: "Use $review-dotnet-migration to review this migration or upgrade using repository context."

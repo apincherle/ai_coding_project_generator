@@ -15,14 +15,19 @@
         "review-java-change",
         "diagnose-java-failure",
         "refactor-java-code",
-        "secure-java-review"
+        "secure-java-review",
+        "init-product-context",
+        "check-context-completeness",
+        "governance-review",
+        "production-readiness-assessment",
+        "human-git-handoff"
       ]
     },
     "python": {
       "displayName": "Python service",
       "category": "backend",
       "maturity": "runnable",
-      "verification": "uv run ruff format --check . && uv run ruff check . && uv run mypy src && uv run pytest",
+      "verification": "uv run ruff format --check . && uv run ruff check . && uv run mypy src && uv run lint-imports && uv run pytest",
       "includeJavaAssets": false,
       "includeFrontendStandards": false,
       "templatePath": "templates/python",
@@ -30,14 +35,26 @@
         "create-python-feature",
         "generate-python-tests",
         "review-python-change",
-        "secure-python-review"
+        "secure-python-review",
+        "diagnose-python-failure",
+        "refactor-python-code",
+        "generate-python-integration-tests",
+        "review-python-migration",
+        "assess-python-dependency",
+        "decide-python-architecture",
+        "threat-model-python",
+        "init-product-context",
+        "check-context-completeness",
+        "governance-review",
+        "production-readiness-assessment",
+        "human-git-handoff"
       ]
     },
     "csharp": {
       "displayName": "C# .NET service",
       "category": "backend",
       "maturity": "runnable",
-      "verification": "dotnet format --verify-no-changes && dotnet build -warnaserror && dotnet test",
+      "verification": "dotnet format --verify-no-changes && dotnet build -warnaserror && dotnet test --collect:\"XPlat Code Coverage\" --settings coverlet.runsettings",
       "includeJavaAssets": false,
       "includeFrontendStandards": false,
       "templatePath": "templates/csharp",
@@ -45,7 +62,19 @@
         "create-dotnet-feature",
         "generate-dotnet-tests",
         "review-dotnet-change",
-        "secure-dotnet-review"
+        "secure-dotnet-review",
+        "diagnose-dotnet-failure",
+        "refactor-dotnet-code",
+        "generate-dotnet-integration-tests",
+        "review-dotnet-migration",
+        "assess-dotnet-dependency",
+        "decide-dotnet-architecture",
+        "threat-model-dotnet",
+        "init-product-context",
+        "check-context-completeness",
+        "governance-review",
+        "production-readiness-assessment",
+        "human-git-handoff"
       ]
     },
     "c": {

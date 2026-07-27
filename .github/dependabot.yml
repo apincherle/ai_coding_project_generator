@@ -1,0 +1,109 @@
+# Dependabot version-update configuration for the AI Engineering Starter Kit catalogue.
+#
+# Limitation: for the "github-actions" ecosystem, Dependabot only discovers workflow files
+# under the repository-root ".github/workflows" directory (and a root action.yml/action.yaml);
+# a non-root `directory` value is not honoured for workflow discovery
+# (see dependabot/dependabot-core#5047). The nested workflows under
+# templates/*/.github/workflows are therefore NOT scanned automatically — review their pinned
+# action versions manually as part of docs/upgrades/migration-guide.md.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "deps(actions)"
+
+  - package-ecosystem: "uv"
+    directory: "/templates/python"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "deps(python-template)"
+    groups:
+      python-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "uv"
+    directory: "/tools/project-generator-api"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "deps(generator-api)"
+    groups:
+      python-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "maven"
+    directory: "/templates/java"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "java"
+    commit-message:
+      prefix: "deps(java-template)"
+    groups:
+      java-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "nuget"
+    directory: "/templates/csharp"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "csharp"
+    commit-message:
+      prefix: "deps(csharp-template)"
+    groups:
+      dotnet-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "docker"
+    directory: "/templates/python"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "deps(python-template-docker)"
+
+  - package-ecosystem: "docker"
+    directory: "/templates/csharp"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "deps(csharp-template-docker)"
+
+  - package-ecosystem: "docker"
+    directory: "/templates/java"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "deps(java-template-docker)"

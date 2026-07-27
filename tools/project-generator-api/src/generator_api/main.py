@@ -17,6 +17,9 @@ from fastapi.openapi.utils import get_openapi
 from pydantic import BaseModel, Field, ValidationError, field_validator
 
 PROJECT_NAME_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+ENTITY_NAME_PATTERN = re.compile(r"^[A-Z][A-Za-z0-9]*$")
+RISK_CLASSIFICATIONS = ("low", "medium", "high", "critical")
+DATA_CLASSIFICATIONS = ("public", "internal", "confidential", "restricted")
 
 
 def catalogue_root() -> Path:
@@ -43,6 +46,27 @@ def load_profiles() -> dict:
 
 def profile_names() -> list[str]:
     return sorted(load_profiles().keys())
+
+
+def approved_config_root() -> Path:
+    """Only files under catalogue manifests/ may be referenced as config_path."""
+    return (catalogue_root() / "manifests").resolve()
+
+
+def resolve_approved_config_path(value: str) -> Path:
+    root = approved_config_root()
+    raw = Path(value.strip().strip('"').strip("'"))
+    candidate = raw.resolve() if raw.is_absolute() else (root / raw).resolve()
+    try:
+        candidate.relative_to(root)
+    except ValueError as exc:
+        raise ValueError(
+            "config_path must resolve under the catalogue manifests/ directory "
+            "(absolute paths outside manifests/ are rejected)."
+        ) from exc
+    if not candidate.is_file():
+        raise ValueError(f"config_path is not a readable file under manifests/: {candidate}")
+    return candidate
 
 
 def normalize_destination(value: str) -> str:
@@ -72,6 +96,68 @@ class CreateProjectRequest(BaseModel):
         ),
         examples=[r"C:\Tools\Workspace\Auth", "C:/Tools/Workspace/Auth"],
     )
+    config_path: str | None = Field(
+        default=None,
+        description=(
+            "Optional path relative to catalogue manifests/ (or absolute under that folder), "
+            "e.g. project-config.ci.yml. Paths outside manifests/ are rejected. "
+            "Prefer config_yaml for operator-supplied content."
+        ),
+        examples=["project-config.ci.yml"],
+    )
+    config_yaml: str | None = Field(
+        default=None,
+        description=(
+            "Inline project-config YAML body. Written under manifests/.api-config-uploads/ "
+            "and passed to create-project.ps1. Prefer this over config_path for custom configs."
+        ),
+        examples=[None],
+    )
+    validation_mode: str = Field(
+        default="draft",
+        description="draft allows TODO markers in product context; production rejects them.",
+        examples=["draft", "production"],
+    )
+    entity_name: str | None = Field(
+        default=None,
+        description="PascalCase singular domain entity, e.g. Account (required without config).",
+        examples=["Account"],
+    )
+    description: str | None = Field(
+        default=None,
+        description="Product description (required without config).",
+        examples=["Account management API"],
+    )
+    technical_owner: str | None = Field(
+        default=None,
+        description="Technical owner (required without config).",
+        examples=["@platform-engineering"],
+    )
+    business_owner: str | None = Field(
+        default=None,
+        description="Business owner (required without config).",
+        examples=["@product-owners"],
+    )
+    risk_classification: str | None = Field(
+        default=None,
+        description=f"One of {', '.join(RISK_CLASSIFICATIONS)} (required without config).",
+        examples=["medium"],
+    )
+    data_classification: str | None = Field(
+        default=None,
+        description=f"One of {', '.join(DATA_CLASSIFICATIONS)} (required without config).",
+        examples=["internal"],
+    )
+    production_criticality: str | None = Field(
+        default=None,
+        description=f"One of {', '.join(RISK_CLASSIFICATIONS)} (required without config).",
+        examples=["medium"],
+    )
+    deployment_target: str | None = Field(
+        default=None,
+        description="Deployment target (required without config).",
+        examples=["kubernetes"],
+    )
 
     @field_validator("profile")
     @classmethod
@@ -95,6 +181,81 @@ class CreateProjectRequest(BaseModel):
     @classmethod
     def validate_destination(cls, value: str) -> str:
         return normalize_destination(value)
+
+    @field_validator("config_path")
+    @classmethod
+    def validate_config_path(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+        cleaned = value.strip().strip('"').strip("'")
+        if not cleaned:
+            return None
+        resolve_approved_config_path(cleaned)
+        return cleaned
+
+    @field_validator("config_yaml")
+    @classmethod
+    def validate_config_yaml(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        cleaned = value.strip()
+        return cleaned or None
+
+    @field_validator("validation_mode")
+    @classmethod
+    def validate_validation_mode(cls, value: str) -> str:
+        if value not in ("draft", "production"):
+            raise ValueError("validation_mode must be 'draft' or 'production'")
+        return value
+
+    @field_validator("entity_name")
+    @classmethod
+    def validate_entity_name(cls, value: str | None) -> str | None:
+        if value is None or value == "":
+            return None
+        if not ENTITY_NAME_PATTERN.fullmatch(value):
+            raise ValueError(
+                "entity_name must match ^[A-Z][A-Za-z0-9]*$ (PascalCase, e.g. Account)"
+            )
+        return value
+
+    @field_validator("description", "technical_owner", "business_owner")
+    @classmethod
+    def blank_to_none(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        cleaned = value.strip()
+        return cleaned or None
+
+    @field_validator("risk_classification", "production_criticality")
+    @classmethod
+    def validate_risk_like(cls, value: str | None) -> str | None:
+        if value is None or value == "":
+            return None
+        if value not in RISK_CLASSIFICATIONS:
+            raise ValueError(
+                f"value must be one of: {', '.join(RISK_CLASSIFICATIONS)}"
+            )
+        return value
+
+    @field_validator("data_classification")
+    @classmethod
+    def validate_data_classification(cls, value: str | None) -> str | None:
+        if value is None or value == "":
+            return None
+        if value not in DATA_CLASSIFICATIONS:
+            raise ValueError(
+                f"data_classification must be one of: {', '.join(DATA_CLASSIFICATIONS)}"
+            )
+        return value
+
+    @field_validator("deployment_target")
+    @classmethod
+    def validate_deployment_target(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        cleaned = value.strip()
+        return cleaned or None
 
 
 class ProfileSummary(BaseModel):
@@ -138,7 +299,10 @@ def find_powershell() -> str:
 
 
 def run_create_project(
-    profile: str, project_name: str, destination: str
+    request: CreateProjectRequest,
+    destination: str,
+    *,
+    resolved_config_path: str | None = None,
 ) -> subprocess.CompletedProcess[str]:
     script = create_project_script()
     if not script.is_file():
@@ -151,12 +315,29 @@ def run_create_project(
         "-File",
         str(script),
         "-Profile",
-        profile,
+        request.profile,
         "-ProjectName",
-        project_name,
+        request.project_name,
         "-Destination",
         destination,
+        "-ValidationMode",
+        request.validation_mode,
     ]
+    optional_args: list[tuple[str, str | None]] = [
+        ("-ConfigPath", resolved_config_path),
+        ("-EntityName", request.entity_name),
+        ("-Description", request.description),
+        ("-TechnicalOwner", request.technical_owner),
+        ("-BusinessOwner", request.business_owner),
+        ("-RiskClassification", request.risk_classification),
+        ("-DataClassification", request.data_classification),
+        ("-ProductionCriticality", request.production_criticality),
+        ("-DeploymentTarget", request.deployment_target),
+    ]
+    for flag, value in optional_args:
+        if value:
+            command.extend([flag, value])
+
     return subprocess.run(
         command,
         check=False,
@@ -175,9 +356,31 @@ def create_project_impl(request: CreateProjectRequest) -> CreateProjectResponse:
             detail=f"Destination must not exist or must be empty: {destination_path}",
         )
 
-    completed = run_create_project(
-        request.profile, request.project_name, str(destination_path)
-    )
+    if request.config_path and request.config_yaml:
+        raise HTTPException(
+            status_code=422,
+            detail="Provide either config_path or config_yaml, not both.",
+        )
+
+    upload_path: Path | None = None
+    resolved_config: str | None = None
+    try:
+        if request.config_yaml:
+            upload_dir = approved_config_root() / ".api-config-uploads"
+            upload_dir.mkdir(parents=True, exist_ok=True)
+            upload_path = upload_dir / f"upload-{os.getpid()}-{id(request)}.yml"
+            upload_path.write_text(request.config_yaml, encoding="utf-8")
+            resolved_config = str(upload_path.resolve())
+        elif request.config_path:
+            resolved_config = str(resolve_approved_config_path(request.config_path))
+
+        completed = run_create_project(
+            request, str(destination_path), resolved_config_path=resolved_config
+        )
+    finally:
+        if upload_path is not None and upload_path.exists():
+            upload_path.unlink(missing_ok=True)
+
     output = (completed.stdout or "") + (completed.stderr or "")
     if completed.returncode != 0:
         raise HTTPException(
@@ -291,12 +494,72 @@ def create_project(
             ),
         ),
     ],
+    config_path: Annotated[
+        str | None,
+        Form(
+            description=(
+                "Optional path under catalogue manifests/ only "
+                "(e.g. project-config.ci.yml)."
+            ),
+        ),
+    ] = None,
+    config_yaml: Annotated[
+        str | None,
+        Form(description="Inline project-config YAML (preferred over config_path)."),
+    ] = None,
+    validation_mode: Annotated[
+        str,
+        Form(description="draft or production"),
+    ] = "draft",
+    entity_name: Annotated[
+        str | None,
+        Form(description="PascalCase singular domain entity (required without config)."),
+    ] = None,
+    description: Annotated[
+        str | None,
+        Form(description="Product description (required without config)."),
+    ] = None,
+    technical_owner: Annotated[
+        str | None,
+        Form(description="Technical owner (required without config)."),
+    ] = None,
+    business_owner: Annotated[
+        str | None,
+        Form(description="Business owner (required without config)."),
+    ] = None,
+    risk_classification: Annotated[
+        str | None,
+        Form(description=f"One of {', '.join(RISK_CLASSIFICATIONS)}."),
+    ] = None,
+    data_classification: Annotated[
+        str | None,
+        Form(description=f"One of {', '.join(DATA_CLASSIFICATIONS)}."),
+    ] = None,
+    production_criticality: Annotated[
+        str | None,
+        Form(description=f"One of {', '.join(RISK_CLASSIFICATIONS)}."),
+    ] = None,
+    deployment_target: Annotated[
+        str | None,
+        Form(description="Deployment target (required without config)."),
+    ] = None,
 ) -> CreateProjectResponse:
     try:
         request = CreateProjectRequest(
             profile=profile,
             project_name=project_name,
             destination=destination,
+            config_path=config_path,
+            config_yaml=config_yaml,
+            validation_mode=validation_mode,
+            entity_name=entity_name,
+            description=description,
+            technical_owner=technical_owner,
+            business_owner=business_owner,
+            risk_classification=risk_classification,
+            data_classification=data_classification,
+            production_criticality=production_criticality,
+            deployment_target=deployment_target,
         )
     except ValidationError as exc:
         raise RequestValidationError(exc.errors()) from exc

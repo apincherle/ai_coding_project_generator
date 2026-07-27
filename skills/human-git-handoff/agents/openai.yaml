@@ -1,0 +1,4 @@
+interface:
+  display_name: "Human Git Handoff"
+  short_description: "Prepare an uncommitted change for a human"
+  default_prompt: "Use $human-git-handoff to prepare a handoff summary for these uncommitted changes."

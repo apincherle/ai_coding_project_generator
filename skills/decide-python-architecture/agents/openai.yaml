@@ -1,0 +1,4 @@
+interface:
+  display_name: "Decide Python Architecture"
+  short_description: "Work through a Python architecture decision"
+  default_prompt: "Use $decide-python-architecture to work through this architecture decision using repository context."

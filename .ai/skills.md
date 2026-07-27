@@ -38,6 +38,13 @@ applicable `.ai/*.md` files completely before acting.
 - `generate-python-tests` — create or repair pytest coverage with meaningful assertions
 - `review-python-change` — review a Python change against repository standards
 - `secure-python-review` — security-focused Python review
+- `diagnose-python-failure` — diagnose build, test, CI, or runtime failures from evidence (fix only when asked)
+- `refactor-python-code` — behaviour-preserving refactor for clarity, boundaries, and testability
+- `generate-python-integration-tests` — end-to-end FastAPI/Testcontainers integration coverage
+- `review-python-migration` — review a dependency/runtime upgrade or data migration
+- `assess-python-dependency` — vet a candidate package against `.ai/tooling-policy.md` before adding it
+- `decide-python-architecture` — facilitate and record an architecture decision as an ADR
+- `threat-model-python` — build or update a lightweight threat model
 
 ### C# / .NET
 
@@ -45,6 +52,21 @@ applicable `.ai/*.md` files completely before acting.
 - `generate-dotnet-tests` — create or repair xUnit / NSubstitute / FluentAssertions tests
 - `review-dotnet-change` — review a .NET change against repository standards
 - `secure-dotnet-review` — security-focused .NET review
+- `diagnose-dotnet-failure` — diagnose build, test, CI, or runtime failures from evidence (fix only when asked)
+- `refactor-dotnet-code` — behaviour-preserving refactor for clarity, boundaries, and testability
+- `generate-dotnet-integration-tests` — end-to-end ASP.NET Core/Testcontainers integration coverage
+- `review-dotnet-migration` — review a dependency/runtime upgrade or EF Core migration
+- `assess-dotnet-dependency` — vet a candidate NuGet package against `.ai/tooling-policy.md` before adding it
+- `decide-dotnet-architecture` — facilitate and record an architecture decision as an ADR
+- `threat-model-dotnet` — build or update a lightweight threat model
+
+### Stack-neutral
+
+- `init-product-context` — populate a freshly generated project's product context and `.ai/project-config.yml`
+- `check-context-completeness` — audit AI context for missing files, placeholders, and drift
+- `governance-review` — review ownership, risk classification, approvals, and exceptions
+- `production-readiness-assessment` — go/no-go check covering health, observability, gates, and rollback
+- `human-git-handoff` — summarize uncommitted changes and hand off Git actions to a human
 
 To make them available in Codex, copy each skill folder into the active Codex skills directory, or install
 them through your organisation's approved skill distribution process. Invoke one explicitly with syntax such as:
@@ -55,6 +77,7 @@ Use $generate-java-tests to cover CustomerService failure paths.
 Use $review-java-change to review this pull request.
 Use $create-python-feature to add a FastAPI search endpoint.
 Use $create-dotnet-feature to add an ASP.NET Core search endpoint.
+Use $production-readiness-assessment to check this service before first release.
 ```
 
 Keep project-specific facts in `.ai/*.md`, not inside the skills. This allows one reusable skill library to

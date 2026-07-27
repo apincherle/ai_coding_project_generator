@@ -1,4 +1,6 @@
 #!/usr/bin/env sh
 set -eu
-dotnet build -warnaserror
-dotnet test
+dotnet restore --use-lock-file
+dotnet build --no-restore -warnaserror
+dotnet test --no-build --collect:"XPlat Code Coverage" --settings coverlet.runsettings
+dotnet list package --vulnerable --include-transitive

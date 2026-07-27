@@ -1,0 +1,4 @@
+interface:
+  display_name: "Threat Model .NET Service"
+  short_description: "Lightweight ASP.NET Core threat modeling"
+  default_prompt: "Use $threat-model-dotnet to build or update the threat model using repository context."

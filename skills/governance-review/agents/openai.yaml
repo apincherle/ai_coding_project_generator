@@ -1,0 +1,4 @@
+interface:
+  display_name: "Governance Review"
+  short_description: "Audit ownership, risk, and approvals"
+  default_prompt: "Use $governance-review to review this change or repository against governance requirements."

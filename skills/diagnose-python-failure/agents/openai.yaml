@@ -1,0 +1,4 @@
+interface:
+  display_name: "Diagnose Python Failure"
+  short_description: "Root-cause Python/FastAPI failures"
+  default_prompt: "Use $diagnose-python-failure to diagnose this failure using repository context."

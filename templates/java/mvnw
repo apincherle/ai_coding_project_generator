@@ -1,0 +1,13 @@
+#!/bin/sh
+# Maven Wrapper bootstrap — downloads wrapper jar on first use when absent.
+set -eu
+root="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+wrapper_jar="$root/.mvn/wrapper/maven-wrapper.jar"
+props="$root/.mvn/wrapper/maven-wrapper.properties"
+if [ ! -f "$wrapper_jar" ]; then
+  wrapper_url=$(sed -n 's/^wrapperUrl=//p' "$props")
+  mkdir -p "$root/.mvn/wrapper"
+  echo "Downloading Maven Wrapper jar..."
+  curl -fsSL -o "$wrapper_jar" "$wrapper_url"
+fi
+exec java -jar "$wrapper_jar" "$@"
