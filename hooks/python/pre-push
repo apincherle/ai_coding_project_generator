@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+set -eu
+root="$(git rev-parse --show-toplevel)"
+cd "$root"
+uv sync --locked --all-groups
+uv run ruff format --check .
+uv run ruff check .
+uv run mypy src
+uv run pytest

@@ -1,6 +1,8 @@
 ---
-description: Repository-wide AI engineering standards
+description: Repository-wide, language-neutral AI engineering standards
 alwaysApply: true
 ---
-Read `AGENTS.md` and the `.ai` guidance. Constructor injection only. Thin controllers.
-Every test contains a meaningful AssertJ assertion. Never weaken gates or expose secrets.
+Read `AGENTS.md` first. Discover `projectContextFile` in `.ai/generation.json`, then read that root
+`<ProjectName>.md` product context file and all applicable `.ai/*.md` standards. Follow the active language
+profile, approved dependency policy, security rules and testing requirements. Make the smallest coherent
+change, report verification evidence, and never stage, commit, push or open a pull request.

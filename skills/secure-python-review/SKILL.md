@@ -5,6 +5,13 @@ description: Perform a risk-based security review of Python or FastAPI code, API
 
 # Secure Python Review
 
+## Product context requirement
+
+Before acting, read `.ai/generation.json`, resolve its `projectContextFile`, and read that root product
+context file completely. If no generation record exists, locate the single root `<ProjectName>.md` product
+context file or ask the user which product context applies. This requirement is in addition to `AGENTS.md`
+and the applicable `.ai/*.md` files.
+
 Read and obey `.ai/version-control-policy.md`. Use Git read-only; never stage, commit, push, change branches,
 rewrite history, or open/merge a pull request.
 

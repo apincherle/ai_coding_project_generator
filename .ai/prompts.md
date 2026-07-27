@@ -19,7 +19,7 @@ Ask the audience to notice: context lives in Git, skills load it, gates prove it
 ## Implement a feature
 
 ```text
-Read AGENTS.md and the relevant .ai standards (project, architecture, coding,
+Read AGENTS.md, the product context file named by .ai/generation.json, and the relevant .ai standards (project, architecture, coding,
 API, security, testing, business rules, domain model, dependencies, tooling-policy).
 Restate acceptance criteria, assumptions, scope and risk.
 Propose the smallest coherent design.

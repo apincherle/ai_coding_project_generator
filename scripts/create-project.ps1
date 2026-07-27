@@ -39,6 +39,7 @@ if ($null -eq $profileProperty) {
     throw "Unknown profile '$Profile'. Available profiles: $available"
 }
 $profileConfig = $profileProperty.Value
+$maturity = if ($profileConfig.PSObject.Properties.Name -contains "maturity") { $profileConfig.maturity } else { "unknown" }
 
 # Destination may be either:
 # 1) the new project root (leaf folder name equals ProjectName), or
@@ -91,6 +92,9 @@ $commonFiles = @(
     ".ai\glossary.md",
     ".ai\tooling-policy.md",
     ".ai\version-control-policy.md",
+    ".ai\prompts.md",
+    ".gitignore",
+    ".gitattributes",
     ".github\pull_request_template.md",
     "docs\adr\0000-template.md",
     "docs\threat-model-template.md",
@@ -112,6 +116,11 @@ foreach ($skill in $profileConfig.recommendedSkills) {
     Copy-CatalogFile "skills\$skill"
 }
 
+# Emit tool-specific entrypoints that all delegate to the same authoritative repository context.
+Copy-CatalogFile "CLAUDE.md"
+Copy-CatalogFile ".github\copilot-instructions.md"
+Copy-CatalogFile ".cursor\rules\standards.mdc"
+
 if ($null -ne $profileConfig.templatePath -and -not [string]::IsNullOrWhiteSpace($profileConfig.templatePath)) {
     Copy-CatalogDirectoryContents $profileConfig.templatePath
     $envExample = Join-Path $destinationPath ".env.example"
@@ -121,15 +130,20 @@ if ($null -ne $profileConfig.templatePath -and -not [string]::IsNullOrWhiteSpace
     }
 }
 
-if ($profileConfig.includeJavaAssets) {
-    foreach ($asset in @("hooks", ".github\workflows\security.yml")) {
-        Copy-CatalogFile $asset
+if ($maturity -eq "runnable") {
+    Copy-CatalogFile "hooks\$Profile\pre-commit" "hooks\pre-commit"
+    Copy-CatalogFile "hooks\$Profile\pre-push" "hooks\pre-push"
+    Copy-CatalogFile "scripts\install-hooks.ps1"
+    Copy-CatalogFile "scripts\install-hooks.sh"
+    Copy-CatalogFile ".github\workflows\security.yml"
+    Copy-CatalogFile "config\semgrep.yml"
+    # Maven verify helpers are Java-only; Python/C# use stack commands in README/hooks.
+    if ($Profile -eq "java") {
+        Copy-CatalogFile "scripts\verify.ps1"
+        Copy-CatalogFile "scripts\verify.sh"
     }
-    Copy-CatalogFile "scripts\verify.ps1"
-    Copy-CatalogFile "scripts\verify.sh"
 }
 
-$maturity = if ($profileConfig.PSObject.Properties.Name -contains "maturity") { $profileConfig.maturity } else { "unknown" }
 $maturityNote = if ($maturity -eq "scaffold") {
     "This profile is scaffold maturity: standards context only. Add build files, tests, CI and skills before treating verification as executable."
 } else {
@@ -168,8 +182,9 @@ Installed stack-specific skills:
 
 $skillList
 
-Every installed skill must locate the repository root and read ``AGENTS.md`` plus the applicable active
-``.ai/*.md`` files before acting. Keep product and language facts in repository context rather than copying
+Every installed skill must locate the repository root, read ``AGENTS.md``, discover the product context
+filename from ``.ai/generation.json`` (falling back to the root ``<ProjectName>.md`` file), and read that
+product context plus the applicable active ``.ai/*.md`` files before acting. Keep product and language facts in repository context rather than copying
 them into skill procedures. Every implementation workflow must report verification evidence and every
 generated test must include a meaningful outcome assertion.
 
@@ -216,6 +231,13 @@ TODO: one short paragraph describing what this product does and who it serves.
 - Domain model: ``.ai/domain-model.md``
 "@
 Set-Content -LiteralPath (Join-Path $destinationPath $projectContextFileName) -Value $projectContext -Encoding utf8
+
+foreach ($entrypoint in @("CLAUDE.md", ".github\copilot-instructions.md", ".cursor\rules\standards.mdc")) {
+    $entrypointPath = Join-Path $destinationPath $entrypoint
+    $entrypointContent = Get-Content -LiteralPath $entrypointPath -Raw
+    $entrypointContent = $entrypointContent.Replace("<ProjectName>.md", $projectContextFileName)
+    Set-Content -LiteralPath $entrypointPath -Value $entrypointContent -Encoding utf8
+}
 
 $agentsMd = @"
 # Repository Instructions for AI Agents
@@ -294,10 +316,13 @@ $($profileConfig.displayName) generated from the AI Engineering Starter Kit.
 1. Enrich ``$projectContextFileName`` with product purpose, scope and AI working notes.
 2. Replace the starter content in ``.ai/project.md``, ``.ai/business-rules.md`` and ``.ai/domain-model.md``.
 3. Record owners, data classification, external systems and deployment constraints.
-4. Confirm verification, hooks and CI run for this stack.
+4. For runnable profiles, have a human run ``scripts/install-hooks.ps1`` (Windows) or
+   ``scripts/install-hooks.sh`` (macOS/Linux), then confirm verification, hooks and CI.
 5. Review ``.env`` values; keep secrets out of Git.
 6. Configure CODEOWNERS, CI secrets and protected-branch rules.
 7. Run a representative test containing a meaningful outcome assertion.
+8. Confirm ``.gitignore`` protects local environments, build output, coverage data and secrets before
+   the first human commit.
 
 ## Product AI context
 

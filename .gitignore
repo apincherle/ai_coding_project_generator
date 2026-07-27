@@ -1,14 +1,22 @@
-# OS
+# Operating systems and editors
 .DS_Store
 Thumbs.db
 Desktop.ini
-
-# Editors / IDEs
 .idea/
-*.iml
 .vscode/
+*.iml
 *.swp
 *~
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+credentials.json
+secrets/
 
 # Java / Maven
 target/
@@ -18,13 +26,16 @@ target/
 .settings/
 
 # Python
+.venv/
+venv/
 __pycache__/
 *.py[cod]
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
-.venv/
-venv/
+.coverage
+coverage.xml
+htmlcov/
 *.egg-info/
 dist/
 build/
@@ -34,32 +45,24 @@ bin/
 obj/
 *.user
 *.suo
+TestResults/
 
-# Node (future templates)
+# Node and browser tooling
 node_modules/
 .pnpm-store/
 coverage/
-dist/
+.next/
+playwright-report/
+test-results/
 
-# Local env and secrets
-.env
-.env.*
-!.env.example
-*.pem
-*.p12
-credentials.json
-secrets/
-
-# Logs and temp
+# Logs and temporary output
 *.log
+*.tmp
 tmp/
 temp/
-*.tmp
 
-# Local handout extract scratch
+# Starter-kit local scratch and template caches
 _pdf_extract/
-
-# Local tool caches under templates
 templates/**/.ruff_cache/
 templates/**/.pytest_cache/
 templates/**/.mypy_cache/

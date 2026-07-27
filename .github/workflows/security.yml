@@ -1,10 +1,20 @@
 name: security
-on: [pull_request]
-permissions: {contents: read}
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
 jobs:
   semgrep:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: returntocorp/semgrep-action@v1
-        with: {config: config/semgrep.yml}
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: semgrep/semgrep-action@v1
+        with:
+          config: config/semgrep.yml

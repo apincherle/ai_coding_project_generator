@@ -5,6 +5,13 @@ description: Refactor Java or Spring Boot code to improve clarity, boundaries, d
 
 # Refactor Java Code
 
+## Product context requirement
+
+Before acting, read `.ai/generation.json`, resolve its `projectContextFile`, and read that root product
+context file completely. If no generation record exists, locate the single root `<ProjectName>.md` product
+context file or ask the user which product context applies. This requirement is in addition to `AGENTS.md`
+and the applicable `.ai/*.md` files.
+
 Read and obey `.ai/version-control-policy.md`. Never stage, commit, push, change branches, rewrite history,
 or open/merge a pull request. Leave changes uncommitted for a human or approved IDE workflow.
 

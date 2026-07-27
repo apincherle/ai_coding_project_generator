@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+set -eu
+root="$(git rev-parse --show-toplevel)"
+cd "$root"
+dotnet format --verify-no-changes
+dotnet build -warnaserror
+dotnet test

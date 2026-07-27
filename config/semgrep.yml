@@ -1,6 +1,21 @@
 rules:
-  - id: no-system-out
+  - id: java-no-system-out
     languages: [java]
-    message: Use structured logging
+    message: Use the approved structured logger instead of System.out.
     severity: WARNING
     pattern: System.out.$METHOD(...)
+  - id: python-no-eval
+    languages: [python]
+    message: Do not execute dynamic input with eval.
+    severity: ERROR
+    pattern: eval(...)
+  - id: python-no-shell-true
+    languages: [python]
+    message: Avoid shell=True; pass an argument list to subprocess APIs.
+    severity: ERROR
+    pattern: subprocess.$METHOD(..., shell=True, ...)
+  - id: csharp-no-process-shell-execute
+    languages: [csharp]
+    message: Do not enable shell execution for process input.
+    severity: ERROR
+    pattern: new ProcessStartInfo(...) { ..., UseShellExecute = true, ... }

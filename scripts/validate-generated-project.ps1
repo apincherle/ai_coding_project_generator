@@ -13,6 +13,11 @@ $record = Get-Content -LiteralPath $recordPath -Raw | ConvertFrom-Json
 
 $required = @(
     "AGENTS.md",
+    "CLAUDE.md",
+    ".cursor\rules\standards.mdc",
+    ".github\copilot-instructions.md",
+    ".gitignore",
+    ".gitattributes",
     "README.md",
     ".ai\active-profile.md",
     ".ai\project.md",
@@ -24,6 +29,8 @@ $required = @(
     ".ai\dependencies.md",
     ".ai\tooling-policy.md",
     ".ai\version-control-policy.md",
+    ".ai\skills.md",
+    ".ai\prompts.md",
     ".github\pull_request_template.md"
 )
 foreach ($relative in $required) {
@@ -52,6 +59,25 @@ if ($agentInstructions -notmatch "Never stage, commit") {
 if ($agentInstructions -notmatch [regex]::Escape($projectContextFile)) {
     throw "AGENTS.md does not require reading product context file '$projectContextFile'."
 }
+foreach ($entrypoint in @("CLAUDE.md", ".cursor\rules\standards.mdc", ".github\copilot-instructions.md")) {
+    $entrypointContent = Get-Content -LiteralPath (Join-Path $projectRoot $entrypoint) -Raw
+    if ($entrypointContent -notmatch "AGENTS\.md" -or $entrypointContent -notmatch [regex]::Escape($projectContextFile)) {
+        throw "AI entrypoint '$entrypoint' does not direct the assistant to AGENTS.md and '$projectContextFile'."
+    }
+}
+
+$gitignore = Get-Content -LiteralPath (Join-Path $projectRoot ".gitignore") -Raw
+foreach ($requiredIgnore in @(".env", "target/", ".venv/", "bin/", "obj/", ".coverage")) {
+    if ($gitignore -notmatch [regex]::Escape($requiredIgnore)) {
+        throw ".gitignore is missing required protection: $requiredIgnore"
+    }
+}
+
+$skillsContext = Get-Content -LiteralPath (Join-Path $projectRoot ".ai\skills.md") -Raw
+if ($skillsContext -notmatch [regex]::Escape($projectContextFile) -and $skillsContext -notmatch "generation\.json") {
+    throw ".ai/skills.md does not require loading product context."
+}
+
 $productContext = Get-Content -LiteralPath (Join-Path $projectRoot $projectContextFile) -Raw
 if ($productContext -notmatch "(?m)^#\s+" -or $productContext -notmatch "Purpose") {
     throw "Product AI context file '$projectContextFile' is missing required minimal sections."
@@ -99,6 +125,21 @@ if ($record.profile -eq "csharp") {
     foreach ($relative in @("CustomerApi.slnx", "src\CustomerApi\CustomerApi.csproj", "tests\CustomerApi.Tests\CustomerServiceTests.cs", "skills\create-dotnet-feature") + $containerFiles) {
         if (-not (Test-Path -LiteralPath (Join-Path $projectRoot $relative))) {
             throw "C# project is missing: $relative"
+        }
+    }
+}
+
+if ($record.maturity -eq "runnable") {
+    foreach ($relative in @(
+        "hooks\pre-commit",
+        "hooks\pre-push",
+        "scripts\install-hooks.ps1",
+        "scripts\install-hooks.sh",
+        ".github\workflows\security.yml",
+        "config\semgrep.yml"
+    )) {
+        if (-not (Test-Path -LiteralPath (Join-Path $projectRoot $relative))) {
+            throw "Runnable profile is missing required enforcement asset: $relative"
         }
     }
 }
