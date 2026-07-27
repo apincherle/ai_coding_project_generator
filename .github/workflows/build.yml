@@ -1,12 +1,115 @@
-name: build
-on: [push, pull_request]
-permissions: {contents: read}
+name: validate starter kit
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
 jobs:
-  verify:
-    runs-on: ubuntu-latest
-    defaults: {run: {working-directory: examples/spring-api}}
+  catalogue:
+    name: validate profile catalogue
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with: {distribution: temurin, java-version: '21', cache: maven}
-      - run: mvn -B verify
+      - uses: actions/checkout@v5
+      - name: Generate and validate every profile
+        shell: pwsh
+        run: |
+          $manifest = Get-Content ./manifests/profiles.json -Raw |
+            ConvertFrom-Json
+          $profiles = $manifest.profiles.PSObject.Properties.Name
+
+          foreach ($profile in $profiles) {
+            $destination = Join-Path $env:RUNNER_TEMP "generated-$profile"
+            ./scripts/create-project.ps1 `
+              -Profile $profile `
+              -ProjectName "ci-$profile" `
+              -Destination $destination
+            ./scripts/validate-generated-project.ps1 -Path $destination
+          }
+
+  java:
+    name: generated Java starter
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+          cache-dependency-path: examples/spring-api/pom.xml
+      - name: Generate and validate
+        shell: pwsh
+        run: |
+          ./scripts/create-project.ps1 `
+            -Profile java `
+            -ProjectName ci-java `
+            -Destination "$env:RUNNER_TEMP/generated-java" `
+            -IncludeJavaExample
+          ./scripts/validate-generated-project.ps1 `
+            -Path "$env:RUNNER_TEMP/generated-java"
+      - name: Verify generated Spring Boot project
+        working-directory: ${{ runner.temp }}/generated-java/examples/spring-api
+        run: mvn -B verify
+
+  python:
+    name: generated Python starter
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: templates/python/pyproject.toml
+      - name: Generate and validate
+        shell: pwsh
+        run: |
+          ./scripts/create-project.ps1 `
+            -Profile python `
+            -ProjectName ci-python `
+            -Destination "$env:RUNNER_TEMP/generated-python"
+          ./scripts/validate-generated-project.ps1 `
+            -Path "$env:RUNNER_TEMP/generated-python"
+      - name: Install approved dependencies
+        working-directory: ${{ runner.temp }}/generated-python
+        run: uv sync --all-groups
+      - name: Verify generated Python project
+        working-directory: ${{ runner.temp }}/generated-python
+        run: |
+          uv run ruff format --check .
+          uv run ruff check .
+          uv run mypy src
+          uv run pytest
+
+  csharp:
+    name: generated C# starter
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "9.0.x"
+      - name: Generate and validate
+        shell: pwsh
+        run: |
+          ./scripts/create-project.ps1 `
+            -Profile csharp `
+            -ProjectName ci-csharp `
+            -Destination "$env:RUNNER_TEMP/generated-csharp"
+          ./scripts/validate-generated-project.ps1 `
+            -Path "$env:RUNNER_TEMP/generated-csharp"
+      - name: Restore approved dependencies
+        working-directory: ${{ runner.temp }}/generated-csharp
+        run: dotnet restore
+      - name: Verify generated C# project
+        working-directory: ${{ runner.temp }}/generated-csharp
+        run: |
+          dotnet format --verify-no-changes --no-restore
+          dotnet build --no-restore --warnaserror
+          dotnet test --no-build --no-restore

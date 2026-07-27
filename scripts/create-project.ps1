@@ -108,13 +108,14 @@ if ($null -ne $profileConfig.templatePath -and -not [string]::IsNullOrWhiteSpace
 }
 
 if ($profileConfig.includeJavaAssets) {
-    foreach ($asset in @("config", "hooks", ".github\workflows\build.yml", ".github\workflows\security.yml")) {
+    foreach ($asset in @("config", "hooks", ".github\workflows\security.yml")) {
         Copy-CatalogFile $asset
     }
     Copy-CatalogFile "scripts\verify.ps1"
     Copy-CatalogFile "scripts\verify.sh"
     if ($IncludeJavaExample) {
         Copy-CatalogFile "examples\spring-api"
+        Copy-CatalogFile "templates\java\.github\workflows\build.yml" ".github\workflows\build.yml"
     }
 } elseif ($IncludeJavaExample) {
     throw "-IncludeJavaExample is valid only with the java profile."

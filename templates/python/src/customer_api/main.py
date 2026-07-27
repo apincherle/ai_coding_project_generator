@@ -7,6 +7,7 @@ from pydantic import BaseModel, EmailStr, Field
 from .repository import CustomerRepository, InMemoryCustomerRepository
 from .service import CustomerNotFoundError, CustomerService
 
+
 class CustomerRequest(BaseModel):
     model_config = {"extra": "forbid", "frozen": True}
     name: str = Field(min_length=1, max_length=200)

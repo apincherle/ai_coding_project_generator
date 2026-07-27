@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 class ApiExceptionHandler {
   @ExceptionHandler(CustomerNotFoundException.class)
   ProblemDetail notFound(CustomerNotFoundException exception) {
-    ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
+    ProblemDetail detail =
+        ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
     detail.setType(URI.create("https://example.com/problems/customer-not-found"));
     detail.setTitle("Customer not found");
     return detail;
