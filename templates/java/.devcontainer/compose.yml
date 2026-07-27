@@ -1,0 +1,14 @@
+# Dev Container override: keep the development image running for the IDE.
+services:
+  app:
+    volumes:
+      - ..:/workspace:cached
+      - dev-m2:/home/app/.m2
+    working_dir: /workspace
+    command: sleep infinity
+    user: app
+    ports:
+      - "${APP_PORT:-8080}:8080"
+
+volumes:
+  dev-m2:

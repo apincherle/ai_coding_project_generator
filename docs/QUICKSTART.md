@@ -37,8 +37,10 @@ The generator does not copy `.ai/profiles/` or unrelated language tooling. Java-
 are included only for the Java profile. Generated projects record their source profile in `.ai/generation.json`.
 
 Java, Python and C# are the only end-to-end profiles: each includes a runnable reference implementation,
-stack-specific tests, Dockerfile, CI workflow, hooks and reusable skills. Every other profile is
-standards-only (`maturity: scaffold`) and requires product-owned build files, tests and CI.
+stack-specific tests, multistage Dockerfile (pinned tool images + ``development`` / ``production`` stages),
+Compose + `.env.example`, Dev Container on the development image, CI workflow, hooks and reusable skills.
+Every other profile is standards-only (`maturity: scaffold`) and requires product-owned build files,
+tests and CI.
 
 ## Alternative: clone and rename the full catalogue
 
@@ -127,7 +129,8 @@ changes without reviewing or preserving them.
 | Python Ruff/mypy configuration | Delete unless polyglot | Add `pyproject.toml` | Delete |
 | .NET analyzers/editor configuration | Delete unless polyglot | Delete | Add `.editorconfig` and analyzer rules |
 | GitHub Actions | Use Maven workflow | Replace with Python workflow | Replace with .NET workflow |
-| Docker and deployment | Replace image/build details | Replace image/build details | Replace image/build details |
+| Docker and Dev Containers | Keep/tailor `Dockerfile`, `compose.yml`, `.env.example`, `.devcontainer/` | Same | Same |
+| Docker secrets | Replace local-only Compose credentials before any shared environment | Same | Same |
 
 Do not retain unused quality tools merely for appearance. Every configured gate must run, be maintained and
 have an accountable owner.

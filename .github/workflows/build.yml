@@ -77,7 +77,7 @@ jobs:
             -Path "$env:RUNNER_TEMP/generated-python"
       - name: Install approved dependencies
         working-directory: ${{ runner.temp }}/generated-python
-        run: uv sync --all-groups
+        run: uv sync --locked --all-groups
       - name: Verify generated Python project
         working-directory: ${{ runner.temp }}/generated-python
         run: |

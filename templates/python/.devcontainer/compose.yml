@@ -1,0 +1,12 @@
+# Dev Container override: keep the development image running for the IDE.
+services:
+  app:
+    volumes:
+      - ..:/app:cached
+      - dev-venv:/app/.venv
+    command: sleep infinity
+    ports:
+      - "${APP_PORT:-8000}:8000"
+
+volumes:
+  dev-venv:

@@ -1,0 +1,47 @@
+{
+  "name": "Python FastAPI (development image)",
+  "dockerComposeFile": ["../compose.yml", "compose.yml"],
+  "service": "app",
+  "workspaceFolder": "/app",
+  "shutdownAction": "stopCompose",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "configureZshAsDefaultShell": false,
+      "upgradePackages": false,
+      "username": "app",
+      "userUid": "automatic",
+      "userGid": "automatic"
+    }
+  },
+  "forwardPorts": [8000, 5432],
+  "portsAttributes": {
+    "8000": { "label": "API", "onAutoForward": "notify" },
+    "5432": { "label": "PostgreSQL", "onAutoForward": "silent" }
+  },
+  "postCreateCommand": "echo 'Tooling (uv, ruff, mypy, pytest) is baked into the development image.'",
+  "postStartCommand": "git config --global --add safe.directory /app || true",
+  "remoteUser": "app",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.mypy-type-checker",
+        "charliermarsh.ruff",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/app/.venv/bin/python",
+        "python.terminal.activateEnvironment": true,
+        "editor.formatOnSave": true,
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": ["tests"]
+      }
+    }
+  },
+  "remoteEnv": {
+    "APP_ENV": "local",
+    "DATABASE_URL": "postgresql://app:local-only-change-me@db:5432/customers",
+    "PORT": "8000"
+  }
+}

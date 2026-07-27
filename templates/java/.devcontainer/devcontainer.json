@@ -1,0 +1,40 @@
+{
+  "name": "Java Spring Boot (development image)",
+  "dockerComposeFile": ["../compose.yml", "compose.yml"],
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "stopCompose",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "configureZshAsDefaultShell": false,
+      "upgradePackages": false,
+      "username": "app",
+      "userUid": "automatic",
+      "userGid": "automatic"
+    }
+  },
+  "forwardPorts": [8080, 5432],
+  "portsAttributes": {
+    "8080": { "label": "API", "onAutoForward": "notify" },
+    "5432": { "label": "PostgreSQL", "onAutoForward": "silent" }
+  },
+  "postCreateCommand": "echo 'Tooling (JDK, Maven, Spotless, Checkstyle via pom) is baked into the development image.'",
+  "postStartCommand": "git config --global --add safe.directory /workspace || true",
+  "remoteUser": "app",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-spring-boot-dashboard",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  },
+  "remoteEnv": {
+    "DB_URL": "jdbc:postgresql://db:5432/customers",
+    "DB_USER": "app",
+    "DB_PASSWORD": "local-only-change-me",
+    "SERVER_PORT": "8080"
+  }
+}

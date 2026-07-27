@@ -3,7 +3,8 @@
 A production-oriented catalogue for consistent, secure AI-assisted development.
 The repository is the durable context: people and AI tools read the same version-controlled rules.
 
-Java, Python and C# are end-to-end runnable profiles with templates, skills and verification.
+Java, Python and C# are end-to-end runnable profiles with templates, skills, verification,
+and multistage Docker/Compose/Dev Container assets (development toolchain baked from pinned images).
 All other language profiles are standards-only scaffolds and require a product build/test payload.
 
 ## Quick start

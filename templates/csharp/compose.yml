@@ -27,11 +27,10 @@ services:
       - path: .env
         required: false
     environment:
-      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-customers}
-      DB_USER: ${POSTGRES_USER:-app}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:-local-only-change-me}
-      SERVER_PORT: ${APP_PORT:-8080}
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ASPNETCORE_URLS: http://+:${APP_PORT:-8080}
       PORT: ${APP_PORT:-8080}
+      ConnectionStrings__Default: Host=db;Port=5432;Database=${POSTGRES_DB:-customers};Username=${POSTGRES_USER:-app};Password=${POSTGRES_PASSWORD:-local-only-change-me}
     ports:
       - "${APP_PORT:-8080}:8080"
     depends_on:
@@ -43,7 +42,7 @@ services:
           path: ./src
           target: /workspace/src
         - action: rebuild
-          path: ./pom.xml
+          path: ./CustomerApi.slnx
 
 volumes:
   postgres-data:

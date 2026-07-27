@@ -1,0 +1,38 @@
+{
+  "name": "C# ASP.NET Core (development image)",
+  "dockerComposeFile": ["../compose.yml", "compose.yml"],
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "stopCompose",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "configureZshAsDefaultShell": false,
+      "upgradePackages": false,
+      "username": "vscode",
+      "userUid": "automatic",
+      "userGid": "automatic"
+    }
+  },
+  "forwardPorts": [8080, 5432],
+  "portsAttributes": {
+    "8080": { "label": "API", "onAutoForward": "notify" },
+    "5432": { "label": "PostgreSQL", "onAutoForward": "silent" }
+  },
+  "postCreateCommand": "echo 'Tooling (dotnet SDK, format, analyzers, xUnit) is baked into the development image.'",
+  "postStartCommand": "git config --global --add safe.directory /workspace || true",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.csdevkit",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  },
+  "remoteEnv": {
+    "ASPNETCORE_ENVIRONMENT": "Development",
+    "ASPNETCORE_URLS": "http://+:8080",
+    "ConnectionStrings__Default": "Host=db;Port=5432;Database=customers;Username=app;Password=local-only-change-me"
+  }
+}

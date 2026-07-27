@@ -1,9 +1,50 @@
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+# syntax=docker/dockerfile:1
+
+ARG SDK_IMAGE=mcr.microsoft.com/dotnet/sdk:9.0
+ARG RUNTIME_IMAGE=mcr.microsoft.com/dotnet/aspnet:9.0
+ARG PORT=8080
+
+# =============================================================================
+# Development - .NET SDK (format, analyzers, test)
+# =============================================================================
+FROM ${SDK_IMAGE} AS development
+ARG PORT
+ENV PORT=${PORT} \
+    ASPNETCORE_URLS=http://+:${PORT} \
+    DOTNET_USE_POLLING_FILE_WATCHER=1
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends git curl ca-certificates tini \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+WORKDIR /workspace
+COPY CustomerApi.slnx Directory.Build.props ./
+COPY src ./src
+COPY tests ./tests
+RUN dotnet restore
+EXPOSE ${PORT}
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["dotnet", "watch", "--project", "src/CustomerApi/CustomerApi.csproj", "run", "--no-launch-profile"]
+
+# =============================================================================
+# Build
+# =============================================================================
+FROM ${SDK_IMAGE} AS build
 WORKDIR /src
-COPY . .
-RUN dotnet publish src/CustomerApi/CustomerApi.csproj -c Release -o /app
-FROM mcr.microsoft.com/dotnet/aspnet:9.0
+COPY CustomerApi.slnx Directory.Build.props ./
+COPY src ./src
+COPY tests ./tests
+RUN dotnet restore src/CustomerApi/CustomerApi.csproj \
+ && dotnet publish src/CustomerApi/CustomerApi.csproj -c Release -o /app --no-restore
+
+# =============================================================================
+# Production (default)
+# =============================================================================
+FROM ${RUNTIME_IMAGE} AS production
+ARG PORT
+ENV ASPNETCORE_URLS=http://+:${PORT} \
+    PORT=${PORT}
 WORKDIR /app
 COPY --from=build /app .
 USER $APP_UID
+EXPOSE ${PORT}
 ENTRYPOINT ["dotnet", "CustomerApi.dll"]

@@ -104,6 +104,11 @@ foreach ($skill in $profileConfig.recommendedSkills) {
 
 if ($null -ne $profileConfig.templatePath -and -not [string]::IsNullOrWhiteSpace($profileConfig.templatePath)) {
     Copy-CatalogDirectoryContents $profileConfig.templatePath
+    $envExample = Join-Path $destinationPath ".env.example"
+    $envFile = Join-Path $destinationPath ".env"
+    if ((Test-Path -LiteralPath $envExample) -and -not (Test-Path -LiteralPath $envFile)) {
+        Copy-Item -LiteralPath $envExample -Destination $envFile -Force
+    }
 }
 
 if ($profileConfig.includeJavaAssets) {
@@ -167,6 +172,38 @@ push, change branches, rewrite history or open/merge a pull request. A human per
 "@
 Set-Content -LiteralPath (Join-Path $destinationPath ".ai\skills.md") -Value $skillsContext -Encoding utf8
 
+$containerSection = if ($null -ne $profileConfig.templatePath -and -not [string]::IsNullOrWhiteSpace($profileConfig.templatePath)) {
+@"
+
+## Containers and Dev Containers
+
+This project includes Docker and Dev Container assets:
+
+- ``Dockerfile`` - multistage image with pinned tool packages and a ``development`` stage
+  (lint/test tooling baked in) plus a minimal ``production`` stage
+- ``compose.yml`` - builds ``target: development`` for app + PostgreSQL
+- ``.env.example`` - local defaults (copied to ``.env`` at generation; do not commit secrets)
+- ``.devcontainer/`` - attaches to the project development image (not a generic language image)
+
+```powershell
+copy .env.example .env
+docker compose up --build
+```
+
+Inside the development container, run the stack verification commands (for example ``ruff`` /
+``mypy`` / ``pytest``, ``mvn verify``, or ``dotnet format`` / ``dotnet test``).
+Open the folder in a Dev Container to develop against Compose PostgreSQL with tooling already present.
+"@
+} else {
+@"
+
+## Containers
+
+This scaffold profile does not yet ship Docker/Dev Container assets. Add a Dockerfile, Compose file
+and ``.devcontainer`` before treating local containers as a project standard.
+"@
+}
+
 $readme = @"
 # $ProjectName
 
@@ -176,9 +213,10 @@ $($profileConfig.displayName) generated from the AI Engineering Starter Kit.
 
 1. Replace the starter content in ``.ai/project.md``, ``.ai/business-rules.md`` and ``.ai/domain-model.md``.
 2. Record owners, data classification, external systems and deployment constraints.
-3. Add the stack-specific build files and make the verification baseline executable.
-4. Configure CODEOWNERS, CI secrets and protected-branch rules.
-5. Run a representative test containing a meaningful outcome assertion.
+3. Confirm verification, hooks and CI run for this stack.
+4. Review ``.env`` values; keep secrets out of Git.
+5. Configure CODEOWNERS, CI secrets and protected-branch rules.
+6. Run a representative test containing a meaningful outcome assertion.
 
 ## Verification baseline
 
@@ -189,7 +227,7 @@ $($profileConfig.verification)
 ## Included skills
 
 $skillList
-
+$containerSection
 ## Governance
 
 Read ``AGENTS.md`` and all applicable ``.ai/*.md`` files before changing code.

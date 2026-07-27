@@ -27,23 +27,25 @@ services:
       - path: .env
         required: false
     environment:
-      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-customers}
-      DB_USER: ${POSTGRES_USER:-app}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:-local-only-change-me}
-      SERVER_PORT: ${APP_PORT:-8080}
-      PORT: ${APP_PORT:-8080}
+      APP_ENV: ${APP_ENV:-local}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-local-only-change-me}@db:5432/${POSTGRES_DB:-customers}
+      PORT: ${APP_PORT:-8000}
     ports:
-      - "${APP_PORT:-8080}:8080"
+      - "${APP_PORT:-8000}:8000"
     depends_on:
       db:
         condition: service_healthy
     develop:
       watch:
         - action: sync
-          path: ./src
-          target: /workspace/src
-        - action: rebuild
-          path: ./pom.xml
+          path: .
+          target: /app
+          ignore:
+            - .venv/
+            - .git/
+            - .ruff_cache/
+            - .pytest_cache/
+            - .mypy_cache/
 
 volumes:
   postgres-data:

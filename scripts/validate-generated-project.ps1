@@ -54,8 +54,17 @@ if ($record.profile -ne "java") {
     }
 }
 
+$containerFiles = @(
+    "Dockerfile",
+    "compose.yml",
+    ".env.example",
+    ".dockerignore",
+    ".devcontainer\devcontainer.json",
+    ".devcontainer\compose.yml"
+)
+
 if ($record.profile -eq "java") {
-    foreach ($relative in @("pom.xml", "src\main\java\com\example\customer\CustomerApiApplication.java", ".github\workflows\build.yml", "skills\create-spring-feature")) {
+    foreach ($relative in @("pom.xml", "src\main\java\com\example\customer\CustomerApiApplication.java", ".github\workflows\build.yml", "skills\create-spring-feature") + $containerFiles) {
         if (-not (Test-Path -LiteralPath (Join-Path $projectRoot $relative))) {
             throw "Java project is missing: $relative"
         }
@@ -63,7 +72,7 @@ if ($record.profile -eq "java") {
 }
 
 if ($record.profile -eq "python") {
-    foreach ($relative in @("pyproject.toml", "src\customer_api\main.py", "tests\test_api.py", "skills\create-python-feature")) {
+    foreach ($relative in @("pyproject.toml", "uv.lock", "src\customer_api\main.py", "tests\test_api.py", "skills\create-python-feature") + $containerFiles) {
         if (-not (Test-Path -LiteralPath (Join-Path $projectRoot $relative))) {
             throw "Python project is missing: $relative"
         }
@@ -71,7 +80,7 @@ if ($record.profile -eq "python") {
 }
 
 if ($record.profile -eq "csharp") {
-    foreach ($relative in @("CustomerApi.slnx", "src\CustomerApi\CustomerApi.csproj", "tests\CustomerApi.Tests\CustomerServiceTests.cs", "skills\create-dotnet-feature")) {
+    foreach ($relative in @("CustomerApi.slnx", "src\CustomerApi\CustomerApi.csproj", "tests\CustomerApi.Tests\CustomerServiceTests.cs", "skills\create-dotnet-feature") + $containerFiles) {
         if (-not (Test-Path -LiteralPath (Join-Path $projectRoot $relative))) {
             throw "C# project is missing: $relative"
         }
