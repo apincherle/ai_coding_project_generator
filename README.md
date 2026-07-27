@@ -3,8 +3,8 @@
 A production-oriented catalogue for consistent, secure AI-assisted development.
 The repository is the durable context: people and AI tools read the same version-controlled rules.
 
-Default active context is Java 21 / Spring Boot. Runnable generators also exist for Python and C#.
-Other language profiles ship as standards scaffolds only — see `.ai/profiles/README.md`.
+Java, Python and C# are end-to-end runnable profiles with templates, skills and verification.
+All other language profiles are standards-only scaffolds and require a product build/test payload.
 
 ## Quick start
 
@@ -12,7 +12,7 @@ Other language profiles ship as standards scaffolds only — see `.ai/profiles/R
 2. Install Java 21, Maven 3.9+, Docker, and Git.
 3. Run `git config core.hooksPath hooks`.
 4. Run `./scripts/verify.sh` (or `scripts\verify.ps1` on Windows).
-5. Open `examples/spring-api` and run `mvn verify`.
+5. Run `mvn verify` inside `templates/java` to verify the Java reference template.
 
 ## Non-negotiable gates
 
@@ -33,7 +33,7 @@ replace, retain or delete and how to activate backend, native, Node.js, React or
 For normal use, generate a minimal repository rather than cloning this entire catalogue:
 
 ```powershell
-scripts\create-project.ps1 -Profile java -ProjectName customer-service -Destination C:\Workspace\customer-service
+scripts\create-project.ps1 -Profile java -ProjectName product-api -Destination C:\Workspace\product-api
 ```
 
 Runnable profiles: `java`, `python`, `csharp`. Scaffold-only profiles still receive governance and

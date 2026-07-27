@@ -8,6 +8,7 @@
       "verification": "mvn verify",
       "includeJavaAssets": true,
       "includeFrontendStandards": false,
+      "templatePath": "templates/java",
       "recommendedSkills": [
         "create-spring-feature",
         "generate-java-tests",

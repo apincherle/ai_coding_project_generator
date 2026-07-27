@@ -99,7 +99,7 @@ A human must inspect, stage, commit, push and open the pull request.
 ```text
 Do not clone the full starter-kit catalogue for product work.
 Run scripts/create-project.ps1 with the chosen profile and destination.
-Then replace Customer-example business rules and domain model, confirm
+Then define product-specific business rules and domain terminology, confirm
 verification runs, and install matching skills.
 ```
 

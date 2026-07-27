@@ -10,9 +10,6 @@ param(
     [Parameter(ParameterSetName = "Create", Mandatory = $true)]
     [string]$Destination,
 
-    [Parameter(ParameterSetName = "Create")]
-    [switch]$IncludeJavaExample,
-
     [Parameter(ParameterSetName = "List", Mandatory = $true)]
     [switch]$ListProfiles
 )
@@ -110,17 +107,11 @@ if ($null -ne $profileConfig.templatePath -and -not [string]::IsNullOrWhiteSpace
 }
 
 if ($profileConfig.includeJavaAssets) {
-    foreach ($asset in @("config", "hooks", ".github\workflows\security.yml")) {
+    foreach ($asset in @("hooks", ".github\workflows\security.yml")) {
         Copy-CatalogFile $asset
     }
     Copy-CatalogFile "scripts\verify.ps1"
     Copy-CatalogFile "scripts\verify.sh"
-    if ($IncludeJavaExample) {
-        Copy-CatalogFile "examples\spring-api"
-        Copy-CatalogFile "templates\java\.github\workflows\build.yml" ".github\workflows\build.yml"
-    }
-} elseif ($IncludeJavaExample) {
-    throw "-IncludeJavaExample is valid only with the java profile."
 }
 
 $maturity = if ($profileConfig.PSObject.Properties.Name -contains "maturity") { $profileConfig.maturity } else { "unknown" }
@@ -214,7 +205,6 @@ $generationRecord = [ordered]@{
     maturity = $maturity
     sourceCatalogue = "AI Engineering Starter Kit"
     generatedAtUtc = [DateTime]::UtcNow.ToString("o")
-    includedJavaExample = [bool]$IncludeJavaExample
 }
 $generationRecord | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $destinationPath ".ai\generation.json") -Encoding utf8
 

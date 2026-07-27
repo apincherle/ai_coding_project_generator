@@ -23,7 +23,7 @@ It is **not** a product application. Do not clone the whole tree for ordinary de
 | `.ai/` | Authoritative standards |
 | `.ai/profiles/` | Per-language context templates |
 | `skills/` | Codex-style skill procedures |
-| `examples/spring-api/` | Java reference Customer API |
+| `templates/java/` | Runnable Java generator template |
 | `templates/python`, `templates/csharp` | Generator payloads |
 | `scripts/` | activate-profile, create-project, verify |
 | `manifests/profiles.json` | Profile registry + maturity |
@@ -49,9 +49,8 @@ scripts\create-project.ps1 -ListProfiles
 ```powershell
 scripts\create-project.ps1 `
   -Profile java `
-  -ProjectName customer-service `
-  -Destination C:\Workspace\customer-service `
-  -IncludeJavaExample
+  -ProjectName product-api `
+  -Destination C:\Workspace\product-api
 ```
 
 Python / C# examples:
@@ -81,7 +80,7 @@ Replaces only: `.ai/project.md`, `coding-standards.md`, `testing.md`, `dependenc
 
 | Profile | Typical local check |
 |---|---|
-| Java | `mvn verify` (see `examples/spring-api`, `scripts/verify.*`) |
+| Java | `mvn verify` (generated from `templates/java`) |
 | Python | `uv run ruff … && uv run mypy src && uv run pytest` |
 | C# | `dotnet format --verify-no-changes && dotnet build -warnaserror && dotnet test` |
 
@@ -96,7 +95,7 @@ Replaces only: `.ai/project.md`, `coding-standards.md`, `testing.md`, `dependenc
 
 ## After generating a product repo
 
-1. Replace Customer-example content in `.ai/business-rules.md` and `.ai/domain-model.md`.
+1. Define product-specific content in `.ai/business-rules.md` and `.ai/domain-model.md`.
 2. Record owners, data classification, integrations.
 3. Confirm verification actually runs in CI.
 4. Install matching skills.

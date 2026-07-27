@@ -40,19 +40,18 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: maven
-          cache-dependency-path: examples/spring-api/pom.xml
+          cache-dependency-path: templates/java/pom.xml
       - name: Generate and validate
         shell: pwsh
         run: |
           ./scripts/create-project.ps1 `
             -Profile java `
             -ProjectName ci-java `
-            -Destination "$env:RUNNER_TEMP/generated-java" `
-            -IncludeJavaExample
+            -Destination "$env:RUNNER_TEMP/generated-java"
           ./scripts/validate-generated-project.ps1 `
             -Path "$env:RUNNER_TEMP/generated-java"
       - name: Verify generated Spring Boot project
-        working-directory: ${{ runner.temp }}/generated-java/examples/spring-api
+        working-directory: ${{ runner.temp }}/generated-java
         run: mvn -B verify
 
   python:

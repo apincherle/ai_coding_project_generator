@@ -1,0 +1,6 @@
+rules:
+  - id: no-system-out
+    languages: [java]
+    message: Use structured logging
+    severity: WARNING
+    pattern: System.out.$METHOD(...)

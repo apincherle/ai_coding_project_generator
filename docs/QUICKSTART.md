@@ -10,9 +10,8 @@ only common governance and the selected stack:
 ```powershell
 scripts\create-project.ps1 `
   -Profile java `
-  -ProjectName customer-service `
-  -Destination C:\Workspace\customer-service `
-  -IncludeJavaExample
+  -ProjectName product-api `
+  -Destination C:\Workspace\product-api
 ```
 
 ```powershell
@@ -37,9 +36,9 @@ scripts\validate-generated-project.ps1 C:\Workspace\payments-api
 The generator does not copy `.ai/profiles/` or unrelated language tooling. Java-only skills and configurations
 are included only for the Java profile. Generated projects record their source profile in `.ai/generation.json`.
 
-Java, Python and C# currently include runnable Customer API reference implementations, stack-specific tests,
-Dockerfiles, CI workflows, hooks and reusable skills. Other profiles currently generate standards scaffolds
-only (`maturity: scaffold` in `manifests/profiles.json`).
+Java, Python and C# are the only end-to-end profiles: each includes a runnable reference implementation,
+stack-specific tests, Dockerfile, CI workflow, hooks and reusable skills. Every other profile is
+standards-only (`maturity: scaffold`) and requires product-owned build files, tests and CI.
 
 ## Alternative: clone and rename the full catalogue
 
@@ -59,7 +58,8 @@ Update these files before generating code:
 5. `README.md` - product-specific setup, ownership and operating instructions.
 6. `.github/CODEOWNERS`, deployment configuration and environment names when added.
 
-Do not leave example Customer API rules in a real project.
+Define the real product rules and domain terminology before implementation. Bundled sample types are not
+product requirements.
 
 ## 2. Choose a language profile
 
@@ -120,7 +120,7 @@ changes without reviewing or preserving them.
 |---|---|---|---|
 | `.ai/security.md`, governance, API and business context | Keep and tailor | Keep and tailor | Keep and tailor |
 | Active language files | Activate Java profile | Activate Python profile | Activate C# profile |
-| `examples/spring-api/` | Keep as reference or replace with product | Delete | Delete |
+| `templates/java/` | Source template used by generator | Not copied | Not copied |
 | Java-specific skills | Keep | Delete or replace | Delete or replace |
 | Git hooks and verification scripts | Use Maven commands | Replace with uv/Ruff/pytest/mypy | Replace with dotnet commands |
 | `config/checkstyle.xml`, PMD and SpotBugs | Keep | Delete | Delete |
@@ -138,7 +138,7 @@ The supplied skills named `*-java-*` or containing Spring-specific instructions 
 
 For Java:
 
-- Keep all six skills.
+- Keep all six Java skills.
 - Update repository context rather than copying project facts into the skill.
 
 For Python, C#, C, C++, Rust or Scala:
@@ -277,8 +277,8 @@ Keep fast checks in pre-commit and the complete verification in pre-push and CI.
 
 Delete or replace:
 
-- `examples/spring-api/` after the team no longer needs the reference.
-- Customer-specific content in `.ai/business-rules.md` and `.ai/domain-model.md`.
+- Catalogue-only templates and profiles not required by the generated repository.
+- Placeholder content in `.ai/business-rules.md` and `.ai/domain-model.md`.
 - Example MCP server entries not approved for the project.
 - CI workflows for unused languages or publishing targets.
 - Tool configurations that are not executed.
@@ -298,7 +298,7 @@ Keep:
 Before the first feature:
 
 - [ ] Product purpose, owner, data classification and risk level are documented.
-- [ ] Customer example terminology has been removed.
+- [ ] Product-specific business rules and domain terminology are documented.
 - [ ] One language profile is active and internally consistent.
 - [ ] Build, format, static analysis and tests run locally and in CI.
 - [ ] Hooks point to real commands for the selected language.
