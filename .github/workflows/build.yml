@@ -22,7 +22,8 @@ jobs:
           $profiles = $manifest.profiles.PSObject.Properties.Name
 
           foreach ($profile in $profiles) {
-            $destination = Join-Path $env:RUNNER_TEMP "generated-$profile"
+            # Leaf folder must match -ProjectName (or pass a parent folder).
+            $destination = Join-Path $env:RUNNER_TEMP "ci-$profile"
             ./scripts/create-project.ps1 `
               -Profile $profile `
               -ProjectName "ci-$profile" `
@@ -47,11 +48,11 @@ jobs:
           ./scripts/create-project.ps1 `
             -Profile java `
             -ProjectName ci-java `
-            -Destination "$env:RUNNER_TEMP/generated-java"
+            -Destination "$env:RUNNER_TEMP/ci-java"
           ./scripts/validate-generated-project.ps1 `
-            -Path "$env:RUNNER_TEMP/generated-java"
+            -Path "$env:RUNNER_TEMP/ci-java"
       - name: Verify generated Spring Boot project
-        working-directory: ${{ runner.temp }}/generated-java
+        working-directory: ${{ runner.temp }}/ci-java
         run: mvn -B verify
 
   python:
@@ -72,14 +73,14 @@ jobs:
           ./scripts/create-project.ps1 `
             -Profile python `
             -ProjectName ci-python `
-            -Destination "$env:RUNNER_TEMP/generated-python"
+            -Destination "$env:RUNNER_TEMP/ci-python"
           ./scripts/validate-generated-project.ps1 `
-            -Path "$env:RUNNER_TEMP/generated-python"
+            -Path "$env:RUNNER_TEMP/ci-python"
       - name: Install approved dependencies
-        working-directory: ${{ runner.temp }}/generated-python
+        working-directory: ${{ runner.temp }}/ci-python
         run: uv sync --locked --all-groups
       - name: Verify generated Python project
-        working-directory: ${{ runner.temp }}/generated-python
+        working-directory: ${{ runner.temp }}/ci-python
         run: |
           uv run ruff format --check .
           uv run ruff check .
@@ -100,14 +101,14 @@ jobs:
           ./scripts/create-project.ps1 `
             -Profile csharp `
             -ProjectName ci-csharp `
-            -Destination "$env:RUNNER_TEMP/generated-csharp"
+            -Destination "$env:RUNNER_TEMP/ci-csharp"
           ./scripts/validate-generated-project.ps1 `
-            -Path "$env:RUNNER_TEMP/generated-csharp"
+            -Path "$env:RUNNER_TEMP/ci-csharp"
       - name: Restore approved dependencies
-        working-directory: ${{ runner.temp }}/generated-csharp
+        working-directory: ${{ runner.temp }}/ci-csharp
         run: dotnet restore
       - name: Verify generated C# project
-        working-directory: ${{ runner.temp }}/generated-csharp
+        working-directory: ${{ runner.temp }}/ci-csharp
         run: |
           dotnet format --verify-no-changes --no-restore
           dotnet build --no-restore --warnaserror
