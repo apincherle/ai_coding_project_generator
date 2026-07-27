@@ -1,5 +1,6 @@
 using FluentAssertions;
 using NSubstitute;
+using Xunit;
 
 namespace CustomerApi.Tests;
 
@@ -27,5 +28,6 @@ public sealed class CustomerServiceTests
 
         result.Name.Should().Be("Bob");
         result.Email.Should().Be("bob@example.com");
+        result.Id.Should().NotBeEmpty();
     }
 }
