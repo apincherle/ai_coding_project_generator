@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Python Feature"
+  short_description: "Build tested FastAPI features safely"
+  default_prompt: "Use $create-python-feature to implement this Python feature using repository context."

@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+set -eu
+dotnet format --verify-no-changes
+dotnet test

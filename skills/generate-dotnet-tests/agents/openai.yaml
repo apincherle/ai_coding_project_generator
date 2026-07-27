@@ -1,0 +1,4 @@
+interface:
+  display_name: "Generate .NET Tests"
+  short_description: "Create meaningful xUnit and NSubstitute tests"
+  default_prompt: "Use $generate-dotnet-tests to add behavioural .NET tests with real assertions."

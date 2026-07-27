@@ -1,0 +1,4 @@
+interface:
+  display_name: "Generate Java Tests"
+  short_description: "Create meaningful JUnit and Mockito tests"
+  default_prompt: "Use $generate-java-tests to add behavioural tests with real assertions."

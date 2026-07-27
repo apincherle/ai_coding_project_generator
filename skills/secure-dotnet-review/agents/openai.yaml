@@ -1,0 +1,4 @@
+interface:
+  display_name: "Secure .NET Review"
+  short_description: "Assess ASP.NET Core security risks"
+  default_prompt: "Use $secure-dotnet-review to perform a risk-based .NET security review."

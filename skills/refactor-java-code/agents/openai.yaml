@@ -1,0 +1,4 @@
+interface:
+  display_name: "Refactor Java Code"
+  short_description: "Refactor Java safely without behaviour drift"
+  default_prompt: "Use $refactor-java-code to improve this code while preserving behaviour."

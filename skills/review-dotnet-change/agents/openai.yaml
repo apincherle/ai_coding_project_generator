@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review .NET Change"
+  short_description: "Review C# changes against repository rules"
+  default_prompt: "Use $review-dotnet-change to review this C# change against project context."

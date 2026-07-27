@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Python Change"
+  short_description: "Review Python changes against repository rules"
+  default_prompt: "Use $review-python-change to review this Python change against project context."

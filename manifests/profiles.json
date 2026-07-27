@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "profiles": {
+    "java": {
+      "displayName": "Java Spring Boot service",
+      "category": "backend",
+      "verification": "mvn verify",
+      "includeJavaAssets": true,
+      "includeFrontendStandards": false,
+      "recommendedSkills": [
+        "create-spring-feature",
+        "generate-java-tests",
+        "review-java-change",
+        "diagnose-java-failure",
+        "refactor-java-code",
+        "secure-java-review"
+      ]
+    },
+    "python": {
+      "displayName": "Python service",
+      "category": "backend",
+      "verification": "uv run ruff format --check . && uv run ruff check . && uv run mypy src && uv run pytest",
+      "includeJavaAssets": false,
+      "includeFrontendStandards": false,
+      "templatePath": "templates/python",
+      "recommendedSkills": [
+        "create-python-feature",
+        "generate-python-tests",
+        "review-python-change",
+        "secure-python-review"
+      ]
+    },
+    "csharp": {
+      "displayName": "C# .NET service",
+      "category": "backend",
+      "verification": "dotnet format --verify-no-changes && dotnet build -warnaserror && dotnet test",
+      "includeJavaAssets": false,
+      "includeFrontendStandards": false,
+      "templatePath": "templates/csharp",
+      "recommendedSkills": [
+        "create-dotnet-feature",
+        "generate-dotnet-tests",
+        "review-dotnet-change",
+        "secure-dotnet-review"
+      ]
+    },
+    "c": {
+      "displayName": "C native project",
+      "category": "native",
+      "verification": "cmake --preset ci && cmake --build --preset ci && ctest --preset ci --output-on-failure",
+      "includeJavaAssets": false,
+      "includeFrontendStandards": false,
+      "recommendedSkills": []
+    },
+    "cpp": {
+      "displayName": "C++ native project",
+      "category": "native",
+      "verification": "cmake --preset ci && cmake --build --preset ci && ctest --preset ci --output-on-failure",
+      "includeJavaAssets": false,
+      "includeFrontendStandards": false,
+      "recommendedSkills": []
+    },
+    "rust": {
+      "displayName": "Rust project",
+      "category": "native",
+      "verification": "cargo fmt --check && cargo clippy --all-targets --all-features -- -D warnings && cargo test --all-targets --all-features",
+      "includeJavaAssets": false,
+      "includeFrontendStandards": false,
+      "recommendedSkills": []
+    },
+    "scala": {
+      "displayName": "Scala service",
+      "category": "backend",
+      "verification": "sbt scalafmtCheckAll scalafixAll --check test",
+      "includeJavaAssets": false,
+      "includeFrontendStandards": false,
+      "recommendedSkills": []
+    },
+    "typescript-node": {
+      "displayName": "TypeScript Node.js service",
+      "category": "backend",
+      "verification": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test",
+      "includeJavaAssets": false,
+      "includeFrontendStandards": false,
+      "recommendedSkills": []
+    },
+    "javascript-node": {
+      "displayName": "JavaScript Node.js service",
+      "category": "backend",
+      "verification": "pnpm format:check && pnpm lint && pnpm test",
+      "includeJavaAssets": false,
+      "includeFrontendStandards": false,
+      "recommendedSkills": []
+    },
+    "react-typescript": {
+      "displayName": "React TypeScript application",
+      "category": "frontend",
+      "verification": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:e2e",
+      "includeJavaAssets": false,
+      "includeFrontendStandards": true,
+      "recommendedSkills": []
+    },
+    "nextjs-typescript": {
+      "displayName": "Next.js TypeScript application",
+      "category": "fullstack",
+      "verification": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:e2e",
+      "includeJavaAssets": false,
+      "includeFrontendStandards": true,
+      "recommendedSkills": []
+    }
+  }
+}

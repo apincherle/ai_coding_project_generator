@@ -1,0 +1,1 @@
+{"mcpServers":{"approved-docs":{"command":"replace-with-approved-command","args":[],"env":{"TOKEN":"${MCP_TOKEN}"}}}}

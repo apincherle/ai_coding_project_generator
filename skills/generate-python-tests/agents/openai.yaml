@@ -1,0 +1,4 @@
+interface:
+  display_name: "Generate Python Tests"
+  short_description: "Create meaningful pytest tests"
+  default_prompt: "Use $generate-python-tests to add behavioural Python tests with real assertions."

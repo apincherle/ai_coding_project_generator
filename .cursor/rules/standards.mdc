@@ -1,0 +1,6 @@
+---
+description: Repository-wide AI engineering standards
+alwaysApply: true
+---
+Read `AGENTS.md` and the `.ai` guidance. Constructor injection only. Thin controllers.
+Every test contains a meaningful AssertJ assertion. Never weaken gates or expose secrets.

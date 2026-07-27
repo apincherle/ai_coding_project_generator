@@ -1,0 +1,4 @@
+interface:
+  display_name: "Secure Python Review"
+  short_description: "Assess FastAPI and Python security risks"
+  default_prompt: "Use $secure-python-review to perform a risk-based Python security review."

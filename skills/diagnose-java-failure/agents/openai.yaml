@@ -1,0 +1,4 @@
+interface:
+  display_name: "Diagnose Java Failure"
+  short_description: "Find evidence-based Java failure causes"
+  default_prompt: "Use $diagnose-java-failure to diagnose this failure without speculative edits."

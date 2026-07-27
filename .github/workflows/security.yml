@@ -1,0 +1,10 @@
+name: security
+on: [pull_request]
+permissions: {contents: read}
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: returntocorp/semgrep-action@v1
+        with: {config: config/semgrep.yml}

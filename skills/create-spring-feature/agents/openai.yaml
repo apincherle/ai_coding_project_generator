@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Spring Feature"
+  short_description: "Build a tested Spring Boot feature safely"
+  default_prompt: "Use $create-spring-feature to implement this feature using the repository context."

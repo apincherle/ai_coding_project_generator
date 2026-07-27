@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Java Change"
+  short_description: "Review Java changes against repository rules"
+  default_prompt: "Use $review-java-change to review this change against project context."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Secure Java Review"
+  short_description: "Assess Spring code for security risks"
+  default_prompt: "Use $secure-java-review to perform a risk-based security review."

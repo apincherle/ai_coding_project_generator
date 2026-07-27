@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create .NET Feature"
+  short_description: "Build tested ASP.NET Core features"
+  default_prompt: "Use $create-dotnet-feature to implement this .NET feature using repository context."
