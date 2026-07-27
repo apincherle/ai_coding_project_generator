@@ -38,7 +38,8 @@ The generator does not copy `.ai/profiles/` or unrelated language tooling. Java-
 are included only for the Java profile. Generated projects record their source profile in `.ai/generation.json`.
 
 Java, Python and C# currently include runnable Customer API reference implementations, stack-specific tests,
-Dockerfiles, CI workflows, hooks and reusable skills. Other profiles currently generate standards scaffolds.
+Dockerfiles, CI workflows, hooks and reusable skills. Other profiles currently generate standards scaffolds
+only (`maturity: scaffold` in `manifests/profiles.json`).
 
 ## Alternative: clone and rename the full catalogue
 

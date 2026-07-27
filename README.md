@@ -1,7 +1,10 @@
 # AI Engineering Starter Kit
 
-A production-oriented baseline for consistent, secure AI-assisted Java development.
+A production-oriented catalogue for consistent, secure AI-assisted development.
 The repository is the durable context: people and AI tools read the same version-controlled rules.
+
+Default active context is Java 21 / Spring Boot. Runnable generators also exist for Python and C#.
+Other language profiles ship as standards scaffolds only — see `.ai/profiles/README.md`.
 
 ## Quick start
 
@@ -19,7 +22,8 @@ The repository is the durable context: people and AI tools read the same version
 - Formatting, static analysis, tests, dependency checks, secret scanning, and CI must pass.
 - AI output is untrusted until inspected.
 
-See `docs/onboarding/GETTING_STARTED.md` and `.ai/skills.md`.
+See `docs/onboarding/GETTING_STARTED.md`, `.ai/skills.md`, and `.ai/prompts.md`.
+Presentation handouts: `docs/handouts/` (Markdown) and the generated PDFs listed in `docs/README.md`.
 
 ## Starting a new repository
 
@@ -32,8 +36,11 @@ For normal use, generate a minimal repository rather than cloning this entire ca
 scripts\create-project.ps1 -Profile java -ProjectName customer-service -Destination C:\Workspace\customer-service
 ```
 
+Runnable profiles: `java`, `python`, `csharp`. Scaffold-only profiles still receive governance and
+language context, but no application template or stack skills yet.
+
 ## Reusable development skills
 
-The `skills/` directory contains six complete Codex skills for feature development, test generation,
-code review, diagnosis, refactoring, and security review. Every skill loads the repository's Markdown
-context before working. See `.ai/skills.md` for installation and invocation examples.
+The `skills/` directory contains Codex skills for Java (6), Python (4), and C# (4): feature work,
+tests, review, and security review, plus Java diagnosis and refactor. Every skill loads the
+repository's Markdown context before working. See `.ai/skills.md` for installation and invocation.

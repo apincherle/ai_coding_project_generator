@@ -1,0 +1,68 @@
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editors / IDEs
+.idea/
+*.iml
+.vscode/
+*.swp
+*~
+
+# Java / Maven
+target/
+*.class
+.classpath
+.project
+.settings/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+
+# Node (future templates)
+node_modules/
+.pnpm-store/
+coverage/
+dist/
+
+# Local env and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+credentials.json
+secrets/
+
+# Logs and temp
+*.log
+tmp/
+temp/
+*.tmp
+
+# Local handout extract scratch
+_pdf_extract/
+
+# Local tool caches under templates
+templates/**/.ruff_cache/
+templates/**/.pytest_cache/
+templates/**/.mypy_cache/
+templates/**/bin/
+templates/**/obj/
+templates/**/target/

@@ -24,10 +24,12 @@ $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
 
 if ($ListProfiles) {
     $manifest.profiles.PSObject.Properties | ForEach-Object {
+        $maturity = if ($_.Value.PSObject.Properties.Name -contains "maturity") { $_.Value.maturity } else { "unknown" }
         [PSCustomObject]@{
             Profile = $_.Name
             Description = $_.Value.displayName
             Category = $_.Value.category
+            Maturity = $maturity
         }
     } | Format-Table -AutoSize
     exit 0
@@ -121,13 +123,23 @@ if ($profileConfig.includeJavaAssets) {
     throw "-IncludeJavaExample is valid only with the java profile."
 }
 
+$maturity = if ($profileConfig.PSObject.Properties.Name -contains "maturity") { $profileConfig.maturity } else { "unknown" }
+$maturityNote = if ($maturity -eq "scaffold") {
+    "This profile is scaffold maturity: standards context only. Add build files, tests, CI and skills before treating verification as executable."
+} else {
+    "This profile is runnable maturity: use the included template or example, skills and verification baseline."
+}
+
 $activeProfile = @"
 # Active Engineering Profile
 
 - Profile: `$Profile`
 - Description: $($profileConfig.displayName)
 - Category: $($profileConfig.category)
+- Maturity: `$maturity`
 - Verification baseline: `$($profileConfig.verification)`
+
+$maturityNote
 
 This file was generated from the AI Engineering Starter Kit catalogue.
 Tailor `.ai/project.md`, business rules, domain model and ownership before implementation.
@@ -199,6 +211,7 @@ $generationRecord = [ordered]@{
     projectName = $ProjectName
     profile = $Profile
     category = $profileConfig.category
+    maturity = $maturity
     sourceCatalogue = "AI Engineering Starter Kit"
     generatedAtUtc = [DateTime]::UtcNow.ToString("o")
     includedJavaExample = [bool]$IncludeJavaExample
