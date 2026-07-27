@@ -31,11 +31,41 @@ Presentation handouts: `docs/handouts/` (Markdown) and the generated PDFs listed
 Read `docs/QUICKSTART.md` before using this kit as a project template. It explains what to rename,
 replace, retain or delete and how to activate backend, native, Node.js, React or Next.js context profiles.
 
-For normal use, generate a minimal repository rather than cloning this entire catalogue:
+### Option A — Swagger UI (recommended)
+
+Requires **uv** and PowerShell (`pwsh` or `powershell`) on PATH.
+
+```powershell
+tools\project-generator-api\scripts\run.ps1
+```
+
+Then open http://127.0.0.1:8090/docs
+
+1. Expand **POST /projects** → **Try it out**
+2. Fill the form fields (not raw JSON):
+   - `profile` — dropdown (e.g. `java`)
+   - `project_name` — e.g. `billing-api`
+   - `destination` — paste a normal Windows path, e.g. `C:\Tools\Workspace\Auth` (no escaping)
+3. **Execute** — the API runs `scripts/create-project.ps1`
+
+Stop the server with `Ctrl+C` in that terminal. Details: `tools/project-generator-api/README.md`.
+
+### Option B — script
+
+Create in a **parent folder** (project folder is created as `<Destination>\<ProjectName>`):
+
+```powershell
+scripts\create-project.ps1 -Profile java -ProjectName product-api -Destination C:\Workspace
+```
+
+Or pass the **full project path** (folder name must match `-ProjectName`):
 
 ```powershell
 scripts\create-project.ps1 -Profile java -ProjectName product-api -Destination C:\Workspace\product-api
 ```
+
+Each generated project includes ``<ProjectName>.md`` — product-specific AI context to enrich with purpose,
+scope and working notes. Agents are instructed to read it before changing code.
 
 Runnable profiles: `java`, `python`, `csharp`. Scaffold-only profiles still receive governance and
 language context, but no application template or stack skills yet.

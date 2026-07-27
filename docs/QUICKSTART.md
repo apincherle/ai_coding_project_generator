@@ -5,14 +5,34 @@ Use this guide when cloning the repository for a new product or changing its dev
 ## Recommended: generate a minimal project
 
 Do not clone the complete catalogue for ordinary product development. Generate a clean repository containing
-only common governance and the selected stack:
+only common governance and the selected stack.
+
+### Swagger UI
+
+Requires **uv** and PowerShell on PATH.
+
+```powershell
+tools\project-generator-api\scripts\run.ps1
+```
+
+Open http://127.0.0.1:8090/docs → **POST /projects** → **Try it out**. Use the form fields and paste
+`destination` as a normal Windows path (e.g. `C:\Tools\Workspace\Auth`) — no JSON escaping.
+
+### Script
 
 ```powershell
 scripts\create-project.ps1 `
   -Profile java `
   -ProjectName product-api `
-  -Destination C:\Workspace\product-api
+  -Destination C:\Workspace
 ```
+
+That creates `C:\Workspace\product-api`. You may also pass the full project path when the leaf folder
+name matches `-ProjectName` (for example `-Destination C:\Workspace\product-api`).
+
+Generated projects include `<ProjectName>.md` (for example `product-api.md`) as the product-specific AI
+context file. Enrich it with purpose, scope and working notes; `AGENTS.md` requires agents to read it
+before changing code.
 
 ```powershell
 scripts\create-project.ps1 `

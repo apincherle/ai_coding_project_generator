@@ -8,6 +8,7 @@ param(
     [string]$ProjectName,
 
     [Parameter(ParameterSetName = "Create", Mandatory = $true)]
+    [Alias("Path", "Location", "OutDir")]
     [string]$Destination,
 
     [Parameter(ParameterSetName = "List", Mandatory = $true)]
@@ -39,14 +40,24 @@ if ($null -eq $profileProperty) {
 }
 $profileConfig = $profileProperty.Value
 
-$destinationPath = [System.IO.Path]::GetFullPath($Destination)
+# Destination may be either:
+# 1) the new project root (leaf folder name equals ProjectName), or
+# 2) a parent location - the project is created at <Destination>/<ProjectName>
+$requestedDestination = [System.IO.Path]::GetFullPath($Destination)
+$destinationLeaf = Split-Path -Leaf $requestedDestination
+if ($destinationLeaf -ieq $ProjectName) {
+    $destinationPath = $requestedDestination
+} else {
+    $destinationPath = [System.IO.Path]::GetFullPath((Join-Path $requestedDestination $ProjectName))
+}
+
 if (Test-Path -LiteralPath $destinationPath) {
     $existing = @(Get-ChildItem -LiteralPath $destinationPath -Force)
     if ($existing.Count -gt 0) {
         throw "Destination must not exist or must be empty: $destinationPath"
     }
 } else {
-    New-Item -ItemType Directory -Path $destinationPath | Out-Null
+    New-Item -ItemType Directory -Force -Path $destinationPath | Out-Null
 }
 
 function Copy-CatalogFile {
@@ -71,7 +82,6 @@ function Copy-CatalogDirectoryContents {
 }
 
 $commonFiles = @(
-    "AGENTS.md",
     ".ai\architecture.md",
     ".ai\api-guidelines.md",
     ".ai\security.md",
@@ -172,6 +182,76 @@ push, change branches, rewrite history or open/merge a pull request. A human per
 "@
 Set-Content -LiteralPath (Join-Path $destinationPath ".ai\skills.md") -Value $skillsContext -Encoding utf8
 
+$projectContextFileName = "$ProjectName.md"
+$projectContext = @"
+# $ProjectName
+
+Product-specific AI context for this repository. Enrich this file as the product evolves.
+Keep secrets, production credentials and client data out of this file.
+
+## Purpose
+
+TODO: one short paragraph describing what this product does and who it serves.
+
+## Scope
+
+- In scope: TODO
+- Out of scope: TODO
+
+## AI working notes
+
+- Preferred approach: TODO (for example smallest vertical slice, API-first, etc.)
+- Important constraints: TODO (for example no breaking public API, no new dependencies without approval)
+- Systems and integrations: TODO
+- Data classification: TODO (for example internal / confidential)
+
+## Open decisions
+
+- TODO
+
+## References
+
+- Active stack profile: see ``.ai/project.md`` and ``.ai/active-profile.md``
+- Business rules: ``.ai/business-rules.md``
+- Domain model: ``.ai/domain-model.md``
+"@
+Set-Content -LiteralPath (Join-Path $destinationPath $projectContextFileName) -Value $projectContext -Encoding utf8
+
+$agentsMd = @"
+# Repository Instructions for AI Agents
+
+Before changing code, read these files completely:
+
+1. ``$projectContextFileName`` - product-specific purpose, scope and AI notes for this repository
+2. ``AGENTS.md`` (this file)
+3. ``.ai/project.md``, ``.ai/architecture.md``, ``.ai/coding-standards.md``, ``.ai/security.md``, and ``.ai/testing.md``
+4. Other applicable ``.ai/*.md`` files for the task (API, business rules, domain model, dependencies, tooling, governance)
+
+Make the smallest coherent change. Never weaken quality gates, delete tests to make a build pass,
+invent requirements, expose secrets, or change a public API without calling it out.
+Run the closest relevant checks, report what ran, and identify anything not verified.
+All generated tests require at least one meaningful state or value assertion.
+
+For work inside a nested application or package, locate and read the nearest applicable ``AGENTS.md`` and
+``.ai`` context in addition to the repository root. More specific guidance applies within its subtree but
+must not weaken root governance or security controls. Browser/UI work must also read
+``.ai/frontend-standards.md`` when present.
+
+Before selecting or adding any library, framework or tool, read ``.ai/tooling-policy.md`` and
+``.ai/dependencies.md``. Use the context-specified choice. If no choice is specified, stop and ask the user
+before adding one. When an approved choice becomes an ongoing project standard, update the relevant ``.ai``
+context, dependency manifest, lockfile and verification configuration in the same change.
+
+Read ``.ai/version-control-policy.md``. Never stage, commit, amend, tag, push, force-push, change branches,
+rewrite history, open a pull request, approve, merge or publish repository changes. This remains prohibited
+even when explicitly requested. Leave changes uncommitted and hand them to a human for inspection and manual
+action through Git or an approved IDE.
+
+Keep durable product facts in ``$projectContextFileName`` and ``.ai/*.md``. Do not bury project-specific
+requirements only inside chat history or skill bodies.
+"@
+Set-Content -LiteralPath (Join-Path $destinationPath "AGENTS.md") -Value $agentsMd -Encoding utf8
+
 $containerSection = if ($null -ne $profileConfig.templatePath -and -not [string]::IsNullOrWhiteSpace($profileConfig.templatePath)) {
 @"
 
@@ -211,12 +291,18 @@ $($profileConfig.displayName) generated from the AI Engineering Starter Kit.
 
 ## Before development
 
-1. Replace the starter content in ``.ai/project.md``, ``.ai/business-rules.md`` and ``.ai/domain-model.md``.
-2. Record owners, data classification, external systems and deployment constraints.
-3. Confirm verification, hooks and CI run for this stack.
-4. Review ``.env`` values; keep secrets out of Git.
-5. Configure CODEOWNERS, CI secrets and protected-branch rules.
-6. Run a representative test containing a meaningful outcome assertion.
+1. Enrich ``$projectContextFileName`` with product purpose, scope and AI working notes.
+2. Replace the starter content in ``.ai/project.md``, ``.ai/business-rules.md`` and ``.ai/domain-model.md``.
+3. Record owners, data classification, external systems and deployment constraints.
+4. Confirm verification, hooks and CI run for this stack.
+5. Review ``.env`` values; keep secrets out of Git.
+6. Configure CODEOWNERS, CI secrets and protected-branch rules.
+7. Run a representative test containing a meaningful outcome assertion.
+
+## Product AI context
+
+``$projectContextFileName`` is the product-specific Markdown context file for this repository.
+Agents must read it before changing code. Keep enriching it as requirements become clearer.
 
 ## Verification baseline
 
@@ -230,7 +316,7 @@ $skillList
 $containerSection
 ## Governance
 
-Read ``AGENTS.md`` and all applicable ``.ai/*.md`` files before changing code.
+Read ``AGENTS.md``, ``$projectContextFileName``, and all applicable ``.ai/*.md`` files before changing code.
 AI output is untrusted until inspected, tested and approved by an accountable human.
 "@
 Set-Content -LiteralPath (Join-Path $destinationPath "README.md") -Value $readme -Encoding utf8
@@ -238,13 +324,16 @@ Set-Content -LiteralPath (Join-Path $destinationPath "README.md") -Value $readme
 $generationRecord = [ordered]@{
     schemaVersion = 1
     projectName = $ProjectName
+    projectContextFile = $projectContextFileName
     profile = $Profile
     category = $profileConfig.category
     maturity = $maturity
+    destination = $destinationPath
     sourceCatalogue = "AI Engineering Starter Kit"
     generatedAtUtc = [DateTime]::UtcNow.ToString("o")
 }
 $generationRecord | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $destinationPath ".ai\generation.json") -Encoding utf8
 
 Write-Output "Created '$ProjectName' with profile '$Profile' at $destinationPath"
-Write-Output "Next: tailor context and verify the project. A human must inspect, stage, commit and push."
+Write-Output "Product AI context file: $projectContextFileName"
+Write-Output "Next: enrich $projectContextFileName, tailor .ai context, then verify. A human must inspect, stage, commit and push."

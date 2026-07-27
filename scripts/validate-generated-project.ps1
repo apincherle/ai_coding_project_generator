@@ -32,6 +32,15 @@ foreach ($relative in $required) {
     }
 }
 
+$projectContextFile = if ($record.PSObject.Properties.Name -contains "projectContextFile" -and $record.projectContextFile) {
+    [string]$record.projectContextFile
+} else {
+    "$($record.projectName).md"
+}
+if (-not (Test-Path -LiteralPath (Join-Path $projectRoot $projectContextFile))) {
+    throw "Product AI context file is missing: $projectContextFile"
+}
+
 $versionControlPolicy = Get-Content -LiteralPath (Join-Path $projectRoot ".ai\version-control-policy.md") -Raw
 if ($versionControlPolicy -notmatch "must never" -or $versionControlPolicy -notmatch "Push or force-push") {
     throw "Human-only version-control policy is incomplete."
@@ -39,6 +48,13 @@ if ($versionControlPolicy -notmatch "must never" -or $versionControlPolicy -notm
 $agentInstructions = Get-Content -LiteralPath (Join-Path $projectRoot "AGENTS.md") -Raw
 if ($agentInstructions -notmatch "Never stage, commit") {
     throw "AGENTS.md does not enforce human-only commit and push."
+}
+if ($agentInstructions -notmatch [regex]::Escape($projectContextFile)) {
+    throw "AGENTS.md does not require reading product context file '$projectContextFile'."
+}
+$productContext = Get-Content -LiteralPath (Join-Path $projectRoot $projectContextFile) -Raw
+if ($productContext -notmatch "(?m)^#\s+" -or $productContext -notmatch "Purpose") {
+    throw "Product AI context file '$projectContextFile' is missing required minimal sections."
 }
 
 if (Test-Path -LiteralPath (Join-Path $projectRoot ".ai\profiles")) {
