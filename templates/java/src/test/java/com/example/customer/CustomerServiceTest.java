@@ -40,4 +40,27 @@ class CustomerServiceTest {
         .containsExactly("Bob", "bob@example.com");
     verify(repository).save(any(Customer.class));
   }
+
+  @Test
+  void updatesExistingCustomer() {
+    UUID id = UUID.randomUUID();
+    when(repository.findById(id))
+        .thenReturn(Optional.of(new Customer(id, "Old", "old@example.com")));
+    when(repository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+    Customer result = service.update(id, new CustomerRequest("New", "new@example.com"));
+
+    assertThat(result)
+        .extracting(Customer::id, Customer::name, Customer::email)
+        .containsExactly(id, "New", "new@example.com");
+  }
+
+  @Test
+  void deleteDelegatesToRepository() {
+    UUID id = UUID.randomUUID();
+
+    service.delete(id);
+
+    verify(repository).deleteById(id);
+  }
 }

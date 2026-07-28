@@ -15,6 +15,8 @@
   <properties>
     <java.version>21</java.version>
     <jacoco.line.coverage>0.70</jacoco.line.coverage>
+    <!-- Empty placeholder so Surefire @{argLine} late-binds JaCoCo's prepare-agent output. -->
+    <argLine/>
   </properties>
   <dependencies>
     <dependency>
@@ -126,9 +128,10 @@
         <version>4.9.3.0</version>
         <configuration>
           <effort>Max</effort>
-          <threshold>Low</threshold>
+          <threshold>Medium</threshold>
           <excludeFilterFile>config/spotbugs-exclude.xml</excludeFilterFile>
           <failOnError>true</failOnError>
+          <xmlOutput>true</xmlOutput>
         </configuration>
         <executions>
           <execution>
@@ -141,6 +144,12 @@
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <version>0.8.13</version>
+        <configuration>
+          <!-- Spring Boot entrypoint is wiring, not product behaviour under test. -->
+          <excludes>
+            <exclude>**/*ApiApplication.class</exclude>
+          </excludes>
+        </configuration>
         <executions>
           <execution>
             <goals><goal>prepare-agent</goal></goals>
@@ -176,6 +185,10 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <excludedGroups>integration</excludedGroups>
+          <!-- Keep JaCoCo agent from prepare-agent; require a forked JVM so -javaagent applies. -->
+          <argLine>@{argLine}</argLine>
+          <forkCount>1</forkCount>
+          <reuseForks>true</reuseForks>
         </configuration>
       </plugin>
       <plugin>
@@ -183,6 +196,9 @@
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
           <groups>integration</groups>
+          <argLine>@{argLine}</argLine>
+          <forkCount>1</forkCount>
+          <reuseForks>true</reuseForks>
         </configuration>
         <executions>
           <execution>

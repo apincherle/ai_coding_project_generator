@@ -3,16 +3,14 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <!-- Microsoft.CodeAnalysis.NetAnalyzers ships in-box with the SDK; EnableNETAnalyzers plus
-         AnalysisLevel/AnalysisMode turn on its full recommended rule set (including design and
-         dependency-direction diagnostics) without adding a separate NuGet package. -->
+    <!-- NetAnalyzers ship in-box with the SDK. EnableNETAnalyzers plus AnalysisLevel/AnalysisMode
+         turn on the recommended rule set without adding a separate NuGet package. -->
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <AnalysisMode>Recommended</AnalysisMode>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <!-- Reproducible restores: run `dotnet restore --use-lock-file` once with the .NET SDK
-         installed to generate packages.lock.json, then commit it. CI and hooks restore with
-         `--use-lock-file` so restores stay pinned once the lock file exists. -->
+    <!-- Reproducible restores: generate packages.lock.json with a locked restore, then commit it.
+         CI and hooks use locked-mode restore so restores stay pinned once the lock file exists. -->
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <!-- NuGet Audit fails restore on known-vulnerable direct and transitive packages. -->
     <NuGetAudit>true</NuGetAudit>

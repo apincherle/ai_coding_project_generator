@@ -7,8 +7,10 @@ function Get-Utf8NoBomContent {
 
 function Set-Utf8NoBomContent {
     param([string]$Path, [string]$Content)
+    # Keep portable LF endings so Spotless/formatters match Linux CI after Windows generation.
+    $normalized = $Content -replace "`r`n", "`n" -replace "`r", "`n"
     $utf8NoBom = New-Object System.Text.UTF8Encoding $false
-    [System.IO.File]::WriteAllText($Path, $Content, $utf8NoBom)
+    [System.IO.File]::WriteAllText($Path, $normalized, $utf8NoBom)
 }
 
 function Rename-DirectoryIfExists {

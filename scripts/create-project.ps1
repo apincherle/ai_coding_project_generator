@@ -212,8 +212,38 @@ function Write-Utf8NoBomFile {
     param([string]$Path, [string]$Content)
     $parent = Split-Path -Parent $Path
     if ($parent) { New-Item -ItemType Directory -Force -Path $parent | Out-Null }
+    $normalized = $Content -replace "`r`n", "`n" -replace "`r", "`n"
     $utf8NoBom = New-Object System.Text.UTF8Encoding $false
-    [System.IO.File]::WriteAllText($Path, $Content, $utf8NoBom)
+    [System.IO.File]::WriteAllText($Path, $normalized, $utf8NoBom)
+}
+
+function Convert-TreeToLf {
+    param(
+        [string]$Root,
+        [string[]]$Extensions = @(
+            '.java', '.xml', '.yml', '.yaml', '.md', '.json', '.cs', '.csproj',
+            '.props', '.targets', '.py', '.toml', '.sh', '.gitignore', '.gitattributes'
+        )
+    )
+    $excludeDirs = @('.git', 'node_modules', 'target', '.venv', 'bin', 'obj', '.idea', '.vs')
+    Get-ChildItem -LiteralPath $Root -Recurse -File -Force | Where-Object {
+        $rel = $_.FullName.Substring($Root.Length).Split([IO.Path]::DirectorySeparatorChar)
+        -not ($rel | Where-Object { $_ -in $excludeDirs }) -and
+            ($Extensions -contains $_.Extension.ToLowerInvariant() -or $_.Name -in @('Dockerfile', 'pom.xml', 'uv.lock'))
+    } | ForEach-Object {
+        try {
+            $bytes = [System.IO.File]::ReadAllBytes($_.FullName)
+            $hasCr = $false
+            foreach ($b in $bytes) { if ($b -eq 13) { $hasCr = $true; break } }
+            if (-not $hasCr) { return }
+            $text = [System.Text.Encoding]::UTF8.GetString($bytes)
+            $normalized = $text -replace "`r`n", "`n" -replace "`r", "`n"
+            $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+            [System.IO.File]::WriteAllText($_.FullName, $normalized, $utf8NoBom)
+        } catch {
+            # Skip unreadable / binary-looking files.
+        }
+    }
 }
 
 function Expand-GovernanceTemplate {
@@ -556,6 +586,8 @@ $generationRecord = [ordered]@{
 }
 $json = $generationRecord | ConvertTo-Json
 Write-Utf8NoBomFile -Path (Join-Path $destinationPath ".ai\generation.json") -Content $json
+
+Convert-TreeToLf -Root $destinationPath
 
 Write-Output "Created '$ProjectName' with profile '$Profile' at $destinationPath"
 Write-Output "Product AI context file: $projectContextFileName"

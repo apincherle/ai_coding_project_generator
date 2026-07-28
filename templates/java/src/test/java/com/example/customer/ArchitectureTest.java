@@ -3,30 +3,42 @@ package com.example.customer;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
-import com.tngtech.archunit.junit.AnalyzeClasses;
-import com.tngtech.archunit.junit.ArchTest;
-import com.tngtech.archunit.lang.ArchRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-@AnalyzeClasses(
-    packages = "com.example.customer",
-    importOptions = ImportOption.DoNotIncludeTests.class)
 class ArchitectureTest {
 
-  @ArchTest
-  static final ArchRule controllersDoNotAccessRepositories =
-      noClasses()
-          .that()
-          .haveSimpleNameEndingWith("Controller")
-          .should()
-          .dependOnClassesThat()
-          .haveSimpleNameEndingWith("Repository");
+  private static JavaClasses classes;
 
-  @ArchTest
-  static final ArchRule servicesAreInApplicationPackage =
-      classes()
-          .that()
-          .haveSimpleNameEndingWith("Service")
-          .should()
-          .resideInAPackage("com.example.customer..");
+  @BeforeAll
+  static void importClasses() {
+    classes =
+        new ClassFileImporter()
+            .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+            .importPackages("com.example.customer");
+  }
+
+  @Test
+  void controllersDoNotAccessRepositories() {
+    noClasses()
+        .that()
+        .haveSimpleNameEndingWith("Controller")
+        .should()
+        .dependOnClassesThat()
+        .haveSimpleNameEndingWith("Repository")
+        .check(classes);
+  }
+
+  @Test
+  void servicesResideInApplicationPackage() {
+    classes()
+        .that()
+        .haveSimpleNameEndingWith("Service")
+        .should()
+        .resideInAPackage("com.example.customer..")
+        .check(classes);
+  }
 }

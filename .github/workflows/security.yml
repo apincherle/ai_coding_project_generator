@@ -13,10 +13,12 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
+      # actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           persist-credentials: false
-      - uses: semgrep/semgrep-action@v1
+      # semgrep/semgrep-action@v1
+      - uses: semgrep/semgrep-action@713efdd345f3035192eaa63f56867b88e63e4e5d
         with:
           config: config/semgrep.yml
 
@@ -25,14 +27,13 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
+      # actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           persist-credentials: false
           fetch-depth: 0
-      # Pinned by major version tag (verified against the vendor-published release notes at
-      # the time of writing). Record the release commit SHA in this comment once the
-      # organisation's supply-chain policy assigns one, and pin to that SHA instead.
-      - uses: gitleaks/gitleaks-action@v3
+      # gitleaks/gitleaks-action@v3
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -41,17 +42,13 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
+      # actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           persist-credentials: false
-      # Filesystem/config scan of manifests, Dockerfiles and lockfiles in this catalogue.
-      # Pinned by version tag; aquasecurity/trivy-action suffered a tag-hijacking supply-chain
-      # attack in March 2026 (GHSA-69fq-xp46-6x23) — only use tags >= v0.35.0, and record the
-      # release commit SHA in this comment to pin by SHA once the organisation assigns one.
-      # Generated projects that build container images should add an `image-ref` scan step
-      # using this same action, pointed at the freshly built image, after `docker build`.
+      # aquasecurity/trivy-action@v0.36.0
       - name: Trivy filesystem scan
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
         with:
           scan-type: fs
           scan-ref: .
@@ -64,7 +61,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v5
+      # actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           persist-credentials: false
       - name: Fail on expired governance exceptions
