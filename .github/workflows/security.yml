@@ -14,7 +14,7 @@ jobs:
     timeout-minutes: 15
     steps:
       # actions/checkout@v5
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
       # semgrep/semgrep-action@v1
@@ -28,7 +28,7 @@ jobs:
     timeout-minutes: 10
     steps:
       # actions/checkout@v5
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
           fetch-depth: 0
@@ -43,7 +43,7 @@ jobs:
     timeout-minutes: 15
     steps:
       # actions/checkout@v5
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
       # aquasecurity/trivy-action@v0.36.0
@@ -62,7 +62,7 @@ jobs:
     timeout-minutes: 5
     steps:
       # actions/checkout@v5
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
       - name: Fail on expired governance exceptions
